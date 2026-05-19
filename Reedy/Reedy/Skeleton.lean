@@ -35,6 +35,7 @@ variable (r : ReedyStructure W₁ W₂ α) {D : Type*} [Category D]
 -- given `a : α`, this is the subbifunctor of `yoneda` which consists of maps of degree `< a`
 -- Note: contrary to C.4.9 in Riehl-Verity, *Elements of ∞-category theory*,
 -- we use `< a` instead of `≤ a`, so that `r.sk ⊥` is empty
+@[simps]
 def skYoneda (a : α) : Subfunctor₂ (yoneda (C := C)) where
   obj _ _ := setOf (fun f ↦ r.degHom f < a)
   map₁ := sorry
@@ -42,13 +43,15 @@ def skYoneda (a : α) : Subfunctor₂ (yoneda (C := C)) where
 
 lemma monotone_skYoneda : Monotone r.skYoneda := sorry
 
+@[simps]
 def boundaryYonedaObj (Y : C) : Subfunctor (yoneda.obj Y) where
-  obj X := setOf (fun f ↦ r.degHom f < r.deg Y)
-  map := sorry
+  obj _ := setOf (fun f ↦ r.degHom f < r.deg Y)
+  map _ _ hg := (r.skYoneda (r.deg Y)).map₂ _ _ hg
 
+@[simps]
 def boundaryCoyonedaObj (X : C) : Subfunctor (coyoneda.obj (op X)) where
-  obj Y := setOf (fun f ↦ r.degHom f < r.deg X)
-  map := sorry
+  obj _ := setOf (fun f ↦ r.degHom f < r.deg X)
+  map _ _ hf := (r.skYoneda (r.deg X)).map₁ _ _ hf
 
 abbrev externalUnionProd (X : C) :
     Subfunctor₂ (FunctorToTypes.externalProduct (coyoneda.obj (op X)) (yoneda.obj X)) :=

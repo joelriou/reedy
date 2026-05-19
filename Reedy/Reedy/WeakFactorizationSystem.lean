@@ -44,18 +44,21 @@ instance [P₁.IsStableUnderRetracts] : (r.left P₁).IsStableUnderRetracts := s
 
 instance [P₂.IsStableUnderRetracts] : (r.right P₂).IsStableUnderRetracts := sorry
 
-instance : (r.right P₂).IsStableUnderRetracts := sorry
+-- C.5.7
+instance [P₁.HasFactorization P₂] : (r.left P₁).HasFactorization (r.right P₂) := sorry
+
+-- C.5.6
+lemma hasLiftingProperty [IsWeakFactorizationSystem P₁ P₂]
+    {A B X Y : C ⥤ D} (i : A ⟶ B) (p : X ⟶ Y) (hi : r.left P₁ i) (hp : r.right P₂ p) :
+    HasLiftingProperty i p := by
+  sorry
 
 -- C.5.5
 instance isWeakFactorizationSystem [IsWeakFactorizationSystem P₁ P₂] :
-    IsWeakFactorizationSystem (r.left P₁) (r.right P₂) := by
+    IsWeakFactorizationSystem (r.left P₁) (r.right P₂) :=
   have : P₁.IsStableUnderRetracts := by rw [← llp_eq_of_wfs P₁ P₂]; infer_instance
   have : P₂.IsStableUnderRetracts := by rw [← rlp_eq_of_wfs P₁ P₂]; infer_instance
-  apply +allowSynthFailures IsWeakFactorizationSystem.mk'
-  · -- C.5.7
-    sorry
-  · -- C.5.6
-    sorry
+  .mk' _ _ (r.hasLiftingProperty _ _)
 
 end ReedyStructure
 
