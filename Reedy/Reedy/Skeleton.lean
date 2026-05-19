@@ -77,9 +77,9 @@ noncomputable def relativeCellComplex [NoMaxOrder α] :
       isColimit₁ := coproductIsCoproduct _
       isColimit₂ := coproductIsCoproduct _
       m := sorry
-      hm := sorry
       g₁ := sorry
       g₂ := sorry
+      hm := sorry
 -- see https://github.com/leanprover-community/mathlib4/pull/38530 for similar proofs
       isPushout := sorry }
 
