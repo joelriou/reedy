@@ -5,7 +5,7 @@ Authors: Joël Riou
 -/
 module
 
-public import Mathlib
+public import Mathlib.Order.ConditionallyCompleteLattice.Basic
 public import Reedy.Subfunctor.SubfunctorTwo
 
 /-!

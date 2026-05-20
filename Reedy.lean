@@ -6,6 +6,7 @@ import Reedy.MorphismProperty.HasTwoOutOfThreeProperty
 import Reedy.MorphismProperty.Identities
 import Reedy.Reedy.Basic
 import Reedy.Reedy.ModelCategory
+import Reedy.Reedy.RelativeCellComplex
 import Reedy.Reedy.SimplexCategory
 import Reedy.Reedy.Skeleton
 import Reedy.Reedy.WeakFactorizationSystem
