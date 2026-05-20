@@ -1,5 +1,6 @@
 import Reedy.Arrow.MkFunctor
 import Reedy.Arrow.ObjectProperty
+import Reedy.KanExtension.FullyFaithful
 import Reedy.MorphismProperty.HasTwoOutOfThreeProperty
 import Reedy.MorphismProperty.Identities
 import Reedy.Reedy.Basic
