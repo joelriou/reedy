@@ -14,5 +14,5 @@ Goals:
 5. the model category structure ([`Reedy.ModelCategory`](https://github.com/joelriou/reedy/blob/main/Reedy/Reedy/ModelCategory.lean))
 
 Required auxiliary API:
-* API for subfunctors are subbifunctors (some API for `SSet.Subcomplex` should be generalized for `Subfunctor`, and a similar API needs to be developed for `Subfunctor₂`)
+* API for subfunctors and subbifunctors (some API for `SSet.Subcomplex` should be generalized for `Subfunctor`, and a similar API needs to be developed for `Subfunctor₂`)
 * Weighted (co)limits, which are required for 3./4./5.
