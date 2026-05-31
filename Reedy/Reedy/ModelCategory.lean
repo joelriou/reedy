@@ -86,7 +86,7 @@ instance :
   exact r.isWeakFactorizationSystem _ _
 
 -- C.5.14
-instance [HasColimitsOfSize.{u, u} D] : ModelCategory (r.FunctorCategory D) :=
+instance : ModelCategory (r.FunctorCategory D) :=
   .mk' _
 
 end FunctorCategory

@@ -30,6 +30,7 @@ def postcompose₂'ObjObj (F : C₁ ⥤ C₂ ⥤ C₃) (G : C₄ ⥤ C₁) :
   obj H := G ⋙ F ⋙ (whiskeringLeft _ _ _).obj H
   map γ := whiskerLeft _ (whiskerLeft _ ((whiskeringLeft _ _ _).map γ))
 
+set_option backward.defeqAttrib.useBackward true in
 @[simps]
 -- better names? (we already have `Functor.postcompose₂`)
 def postcompose₂'Obj (F : C₁ ⥤ C₂ ⥤ C₃) :
@@ -37,6 +38,7 @@ def postcompose₂'Obj (F : C₁ ⥤ C₂ ⥤ C₃) :
   obj G := postcompose₂'ObjObj F G
   map β := { app H := whiskerRight β _ }
 
+set_option backward.defeqAttrib.useBackward true in
 def postcompose₂' :
     (C₁ ⥤ C₂ ⥤ C₃) ⥤ (C₄ ⥤ C₁) ⥤ (C₅ ⥤ C₂) ⥤ C₄ ⥤ C₅ ⥤ C₃ where
   obj := postcompose₂'Obj

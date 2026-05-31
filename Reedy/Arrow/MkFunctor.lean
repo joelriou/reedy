@@ -18,6 +18,7 @@ namespace CategoryTheory
 
 variable {C D : Type*} [Category* C] [Category* D]
 
+set_option backward.defeqAttrib.useBackward true in
 @[simps]
 def Arrow.mkFunctor {F G : C ⥤ D} (τ : F ⟶ G) : C ⥤ Arrow D where
   obj X := Arrow.mk (τ.app X)

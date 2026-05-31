@@ -28,6 +28,7 @@ abbrev WeightedCocone (P : Jᵒᵖ ⥤ Type w) (F : J ⥤ C) :=
 
 namespace WeightedCocone
 
+set_option backward.defeqAttrib.useBackward true in
 @[simps]
 protected def yoneda (F : J ⥤ C) (j : J) :
     WeightedCocone (yoneda.obj j) F where
