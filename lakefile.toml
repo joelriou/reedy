@@ -15,6 +15,5 @@ name = "Reedy"
 [[require]]
 name = "mathlib"
 scope = "leanprover-community"
-rev = "master"
-
+rev = "master-2026-06-01"
 
