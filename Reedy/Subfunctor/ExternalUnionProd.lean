@@ -76,6 +76,7 @@ abbrev externalProduct (F : C ⥤ Type w₁) (G : D ⥤ Type w₂) :
 
 def fromExternalProductCoyonedaObjOpYonedaObj (X : C) :
     externalProduct (coyoneda.obj (op X)) (yoneda.obj X) ⟶ yoneda := by
+  -- this should be given by the composition of morphisms
   sorry
 
 end FunctorToTypes
