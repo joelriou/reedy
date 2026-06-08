@@ -12,7 +12,16 @@ public import Reedy.ObjectProperty.Retracts
 public import Reedy.Reedy.Skeleton
 
 /-!
-# Skeleton
+# Weak factorization systems on the category of functors
+
+If `C` is a Reedy category, and `D` a category equipped with a
+weak factorization system `(W₁, W₂)`, we define a weak
+factorization system on `C ⥤ D`. If `D` is a model category
+structure, the Reedy model category structure on `C ⥤ D` will
+be obtained by applying this construction to
+`(cofibrations D, trivialFibrations D)`
+and `(trivialCofibrations D, fibrations D)`.
+
 
 -/
 
