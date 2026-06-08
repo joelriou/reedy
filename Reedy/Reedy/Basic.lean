@@ -86,6 +86,7 @@ lemma exists_fac {X Y : C} (f : X ⟶ Y) :
 -- This is needed for the definition of `skYoneda` in the file `Reedy/Skeleton.lean`.
 lemma degHom_le {X Z Y : C} (f : X ⟶ Z) (g : Z ⟶ Y) :
     r.degHom (f ≫ g) ≤ r.deg Z := by
+  -- the argument is essentially in the diagram of lemma C.4.7
   sorry
 
 end ReedyStructure
