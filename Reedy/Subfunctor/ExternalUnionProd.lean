@@ -19,6 +19,8 @@ universe w₁ w₂
 
 namespace CategoryTheory
 
+open Opposite
+
 namespace Functor
 
 variable {C₁ C₂ C₃ C₄ C₅ : Type*} [Category* C₁] [Category* C₂] [Category* C₃]
@@ -71,6 +73,10 @@ abbrev externalProductFunctor :
 abbrev externalProduct (F : C ⥤ Type w₁) (G : D ⥤ Type w₂) :
     C ⥤ D ⥤ Type max w₁ w₂ :=
   (externalProductFunctor.obj F).obj G
+
+def fromExternalProductCoyonedaObjOpYonedaObj (X : C) :
+    externalProduct (coyoneda.obj (op X)) (yoneda.obj X) ⟶ yoneda := by
+  sorry
 
 end FunctorToTypes
 

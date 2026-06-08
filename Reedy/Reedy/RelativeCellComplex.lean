@@ -75,7 +75,10 @@ noncomputable def relativeCellComplex [NoMaxOrder α] :
     RelativeCellComplex r.basicCell (Subfunctor₂.ι (⊥ : Subfunctor₂ yoneda)) where
   F := r.monotone_skYoneda.functor ⋙ Subfunctor₂.toFunctorFunctor yoneda
   isoBot := Subfunctor₂.eqToIso (by simp)
-  isWellOrderContinuous := sorry
+  isWellOrderContinuous := by
+    -- the proof should be roughly similar to the definition of
+    -- the field `isColimit` below
+    sorry
   incl := { app a := (r.skYoneda a).ι }
   isColimit := by
     -- use `iSup_skYoneda`
@@ -96,6 +99,7 @@ noncomputable def relativeCellComplex [NoMaxOrder α] :
       g₂ := by
         refine Sigma.desc (fun x ↦ ?_)
         dsimp
+        -- use `FunctorToTypes.fromExternalProductCoyonedaObjOpYonedaObj x.val`
         sorry
       hm := sorry
 -- see https://github.com/leanprover-community/mathlib4/pull/38530 for similar proofs
