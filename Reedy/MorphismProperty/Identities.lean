@@ -27,8 +27,35 @@ abbrev identities : MorphismProperty C :=
 
 variable {C} in
 lemma identities_op_iff {X Y : Cᵒᵖ} (f : X ⟶ Y) :
-    identities Cᵒᵖ f ↔ identities C f.unop :=
-  sorry
+    identities Cᵒᵖ f ↔ identities C f.unop := by
+  simp only [identities, ofHoms_iff]
+  constructor 
+  · intro h 
+    rcases h with ⟨i,hi⟩ 
+    use i.unop 
+    rw [Arrow.mk_eq_mk_iff] at hi
+    rcases hi with ⟨hY, hX, h⟩
+    subst hY
+    subst hX
+    simp only [Category.comp_id, eqToHom_refl] at h
+    simp [h]
+  · intro h
+    rcases h with ⟨i,hi⟩
+    use Opposite.op i 
+    rw [Arrow.mk_eq_mk_iff] at hi
+    rcases hi with ⟨hY, hX, h⟩
+    subst hY  
+    simp [hX] at h ⊢
+    rw [Arrow.mk_eq_mk_iff]
+    have hX' : X = Y := by
+      rw [← Opposite.op_unop X, ← Opposite.op_unop Y]
+      rw [congrArg Opposite.op hX]
+    subst hX'  
+    use rfl, rfl
+    simp only [eqToHom_refl, Category.comp_id] 
+    have hf : f = 𝟙 X := by
+      simpa using congrArg Quiver.Hom.op h
+    exact hf
 
 end MorphismProperty
 
