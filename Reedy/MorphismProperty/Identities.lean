@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2026 Joël Riou. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Joël Riou
+Authors: Joël Riou, Aras Ergus, Julian Külshammer
 -/
 module
 
@@ -27,8 +27,11 @@ abbrev identities : MorphismProperty C :=
 
 variable {C} in
 lemma identities_op_iff {X Y : Cᵒᵖ} (f : X ⟶ Y) :
-    identities Cᵒᵖ f ↔ identities C f.unop :=
-  sorry
+    identities Cᵒᵖ f ↔ identities C f.unop := by
+  obtain ⟨X⟩ := X
+  obtain ⟨f⟩ := f
+  dsimp
+  exact ⟨fun ⟨_⟩ ↦ ⟨_⟩, fun ⟨_⟩ ↦ ⟨_⟩⟩
 
 end MorphismProperty
 
