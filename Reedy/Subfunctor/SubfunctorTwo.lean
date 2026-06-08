@@ -74,9 +74,7 @@ def ι (A : Subfunctor₂ F) : A.toFunctor ⟶ F where
 variable (F) in
 def toFunctorFunctor : Subfunctor₂ F ⥤ C ⥤ D ⥤ Type w where
   obj := toFunctor
-  map f :=
-    { app U :=
-      { app V := ↾(fun x ↦ ⟨x.val, leOfHom f _ _ x.prop⟩) } }
+  map f := { app U := { app V := ↾(fun x ↦ ⟨x.val, leOfHom f _ _ x.prop⟩) } }
 
 end Subfunctor₂
 
