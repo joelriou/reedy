@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2026 Joël Riou. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Joël Riou
+Authors: Joël Riou, Nima Rasekh
 -/
 module
 
@@ -77,6 +77,11 @@ noncomputable def mapFactorizationData {X Y : C} (f : X ⟶ Y) :
 
 @[no_expose]
 noncomputable def degHom {X Y : C} (f : X ⟶ Y) : α := r.deg (r.mapFactorizationData f).Z
+lemma degHom_eq {X Y : C} {f : X ⟶ Y} (h : W₁.MapFactorizationData W₂ f) :
+    r.degHom f = r.deg h.Z := by
+  have := r.subsingleton_mapFactorizationData
+  rw [← Subsingleton.elim (r.mapFactorizationData f) h]
+  rfl
 
 lemma exists_fac {X Y : C} (f : X ⟶ Y) :
     ∃ (Z : C) (a : X ⟶ Z) (b : Z ⟶ Y), W₁ a ∧ W₂ b ∧ a ≫ b = f ∧ r.degHom f = r.deg Z :=
@@ -87,7 +92,18 @@ lemma exists_fac {X Y : C} (f : X ⟶ Y) :
 lemma degHom_le {X Z Y : C} (f : X ⟶ Z) (g : Z ⟶ Y) :
     r.degHom (f ≫ g) ≤ r.deg Z := by
   -- the argument is essentially in the diagram of lemma C.4.7
-  sorry
+  obtain ⟨Zf, f₁, f₂, hf₁, hf₂, fac_f, eq_f⟩ := r.exists_fac f
+  obtain ⟨Zg, g₁, g₂, hg₁, hg₂, fac_g, eq_g⟩ := r.exists_fac g
+  obtain ⟨Zh, h₁, h₂, hh₁, hh₂, fac_h, eq_h⟩ := r.exists_fac (f₂ ≫ g₁)
+  let factfg : W₁.MapFactorizationData W₂ (f ≫ g) :=
+    { Z := Zh
+      i := f₁ ≫ h₁
+      p := h₂ ≫ g₂
+      fac := by simp [reassoc_of% fac_h, reassoc_of% fac_f, fac_g]
+      hi := W₁.comp_mem _ _ hf₁ hh₁
+      hp := W₂.comp_mem _ _ hh₂ hg₂ }
+  rw [r.degHom_eq factfg]
+  exact (r.le₁ _ hh₁).trans (r.le₂ _ hf₂)
 
 end ReedyStructure
 
