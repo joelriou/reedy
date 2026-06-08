@@ -38,7 +38,12 @@ structure Subfunctor₂ where
   (`AlgebraicTopology.SimplicialSet.Subcomplex`) should be generalized to `Subfunctor/Subfunctor₂`
 -/
 
-instance : CompleteLattice (Subfunctor₂ F) := sorry
+instance : PartialOrder (Subfunctor₂ F) :=
+  PartialOrder.lift Subfunctor₂.obj (fun _ _ ↦ Subfunctor₂.ext)
+
+instance : CompleteLattice (Subfunctor₂ F) :=by
+  -- Simon Henry started working on this
+  sorry
 
 namespace Subfunctor₂
 
@@ -54,14 +59,24 @@ def eval₂ (A : Subfunctor₂ F) (V : D) : Subfunctor (F.flip.obj V) where
   obj U := A.obj U V
   map _ := A.map₁ _ _
 
-def toFunctor (A : Subfunctor₂ F) : C ⥤ D ⥤ Type w := sorry
+@[simps]
+def toFunctor (A : Subfunctor₂ F) : C ⥤ D ⥤ Type w where
+  obj U :=
+    { obj V := A.obj U V
+      map g := ↾(fun x ↦ ⟨(F.obj _).map g x, A.map₂ _ _ x.prop⟩) }
+  map f :=
+    { app V := ↾(fun x ↦ ⟨(F.map f).app _ x, A.map₁ _ _ x.prop⟩) }
 
-def ι (A : Subfunctor₂ F) : A.toFunctor ⟶ F := sorry
+@[simps]
+def ι (A : Subfunctor₂ F) : A.toFunctor ⟶ F where
+  app U := { app V := ↾Subtype.val }
 
 variable (F) in
 def toFunctorFunctor : Subfunctor₂ F ⥤ C ⥤ D ⥤ Type w where
   obj := toFunctor
-  map := sorry
+  map f :=
+    { app U :=
+      { app V := ↾(fun x ↦ ⟨x.val, leOfHom f _ _ x.prop⟩) } }
 
 end Subfunctor₂
 
