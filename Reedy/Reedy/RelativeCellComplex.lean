@@ -36,10 +36,19 @@ variable (r : ReedyStructure W₁ W₂ α) {D : Type*} [Category D]
 @[simps]
 def skYoneda (a : α) : Subfunctor₂ (yoneda (C := C)) where
   obj _ _ := setOf (fun f ↦ r.degHom f < a)
-  map₁ := sorry
-  map₂ := sorry
+  map₁ _ _ _ hf := lt_of_le_of_lt (r.degHom_comp_le _ _) hf
+  map₂ _ _ _ _ _ hf := lt_of_le_of_lt (r.degHom_comp_le' _ _) hf
 
-lemma monotone_skYoneda : Monotone r.skYoneda := sorry
+lemma monotone_skYoneda : Monotone r.skYoneda :=
+  fun _ _ h _ _ _ hf ↦ lt_of_lt_of_le hf h
+
+lemma skYoneda_bot : r.skYoneda ⊥ = ⊥ := by aesop
+
+lemma sup_skYoneda [NoMaxOrder α] : ⨆ a, r.skYoneda a = ⊤ := by
+  rw [← top_le_iff]
+  intro U V f _
+  simp only [Subfunctor₂.iSup_obj, skYoneda_obj, Set.mem_iUnion, Set.mem_setOf_eq]
+  exact ⟨Order.succ (r.degHom f), Order.lt_succ _⟩
 
 @[simps]
 def boundaryYonedaObj (Y : C) : Subfunctor (yoneda.obj Y) where
@@ -65,7 +74,7 @@ noncomputable def relativeCellComplex [NoMaxOrder α] :
   F := r.monotone_skYoneda.functor ⋙ Subfunctor₂.toFunctorFunctor yoneda
   isoBot := sorry
   isWellOrderContinuous := sorry
-  incl := sorry
+  incl := { app a := (r.skYoneda a).ι }
   isColimit := sorry
   attachCells a ha :=
     { ι := r.Cell a

@@ -105,6 +105,14 @@ lemma degHom_le {X Z Y : C} (f : X ⟶ Z) (g : Z ⟶ Y) :
   rw [r.degHom_eq factfg]
   exact (r.le₁ _ hh₁).trans (r.le₂ _ hf₂)
 
+lemma degHom_comp_le {X Y Z : C} (f : X ⟶ Y) (g : Y ⟶ Z) :
+    r.degHom (f ≫ g) ≤ r.degHom f := by
+  sorry
+
+lemma degHom_comp_le' {X Y Z : C} (f : X ⟶ Y) (g : Y ⟶ Z) :
+    r.degHom (f ≫ g) ≤ r.degHom g := by
+  sorry
+
 end ReedyStructure
 
 end CategoryTheory
