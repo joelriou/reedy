@@ -46,6 +46,25 @@ def skYoneda (a : α) : Subfunctor₂ (yoneda (C := C)) where
 lemma monotone_skYoneda : Monotone r.skYoneda :=
   fun _ _ h _ _ _ hf ↦ lt_of_lt_of_le hf h
 
+lemma iSup_skYoneda_iio (m : α) (hm : Order.IsSuccLimit m) :
+    ⨆ (a : Set.Iio m), r.skYoneda a = r.skYoneda m := by
+  refine le_antisymm ?_ ?_
+  · simp only [iSup_le_iff, Subtype.forall, Set.mem_Iio]
+    exact fun a ha ↦ r.monotone_skYoneda ha.le
+  · intro U V x hx
+    simp only [skYoneda_obj, Set.mem_setOf_eq] at hx
+    simp only [Subfunctor₂.iSup_obj, skYoneda_obj, Set.iUnion_coe_set, Set.mem_Iio,
+      Set.mem_iUnion, Set.mem_setOf_eq, exists_prop]
+    exact ⟨Order.succ (r.degHom x), by rwa [hm.succ_lt_iff],
+      Order.lt_succ_of_not_isMax (not_isMax_of_lt hx)⟩
+
+set_option backward.defeqAttrib.useBackward true in
+instance : r.monotone_skYoneda.functor.IsWellOrderContinuous where
+  nonempty_isColimit m hm := ⟨Preorder.isColimitOfIsLUB _ _ (by
+    dsimp
+    rw [← r.iSup_skYoneda_iio m hm]
+    apply isLUB_iSup)⟩
+
 @[simp]
 lemma skYoneda_bot : r.skYoneda ⊥ = ⊥ := by aesop
 
@@ -178,10 +197,9 @@ noncomputable def relativeCellComplex [NoMaxOrder α] :
     RelativeCellComplex r.basicCell (Subfunctor₂.ι (⊥ : Subfunctor₂ yoneda)) where
   F := r.monotone_skYoneda.functor ⋙ Subfunctor₂.toFunctorFunctor yoneda
   isoBot := Subfunctor₂.eqToIso (by simp)
-  isWellOrderContinuous := by
-    -- the proof should be roughly similar to the definition of
-    -- the field `isColimit` below
-    sorry
+  isWellOrderContinuous := ⟨fun m hm ↦
+    ⟨isColimitOfPreserves (Subfunctor₂.toFunctorFunctor _)
+      (r.monotone_skYoneda.functor.isColimitOfIsWellOrderContinuous m hm)⟩⟩
   incl := { app a := (r.skYoneda a).ι }
   isColimit :=
     IsColimit.ofIsoColimit
