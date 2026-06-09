@@ -107,11 +107,15 @@ lemma degHom_le {X Z Y : C} (f : X ⟶ Z) (g : Z ⟶ Y) :
 
 lemma degHom_comp_le {X Y Z : C} (f : X ⟶ Y) (g : Y ⟶ Z) :
     r.degHom (f ≫ g) ≤ r.degHom f := by
-  sorry
+  have ⟨_, f₁, f₂, _, _, h_fac, h_deg⟩ := r.exists_fac f
+  rw [h_deg, ← h_fac, Category.assoc]
+  exact r.degHom_le f₁ (f₂ ≫ g)
 
 lemma degHom_comp_le' {X Y Z : C} (f : X ⟶ Y) (g : Y ⟶ Z) :
     r.degHom (f ≫ g) ≤ r.degHom g := by
-  sorry
+  have ⟨_, g₁, g₂, _, _, h_fac, h_deg⟩ := r.exists_fac g
+  rw [h_deg, ← h_fac, <- Category.assoc]
+  exact r.degHom_le (f ≫ g₁) g₂
 
 end ReedyStructure
 
