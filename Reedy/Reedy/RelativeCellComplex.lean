@@ -6,6 +6,7 @@ Authors: Joël Riou
 module
 
 public import Mathlib.AlgebraicTopology.RelativeCellComplex.Basic
+public import Mathlib.CategoryTheory.Limits.Types.Pullbacks
 public import Reedy.Reedy.Basic
 public import Reedy.Subfunctor.ExternalUnionProd
 
@@ -99,7 +100,6 @@ noncomputable def b (a : α) : r.sigmaExternalProduct a ⟶ (r.skYoneda (Order.s
 noncomputable def l (a : α) : r.sigmaExternalUnionProd a ⟶ r.sigmaExternalProduct a :=
   Limits.Sigma.map (fun x ↦ (r.externalUnionProd x).ι)
 
-
 @[reassoc (attr := simp)]
 lemma ιSigmaExternalUnionProd_t {a : α} (c : r.Cell a) :
     r.ιSigmaExternalUnionProd c ≫ t r a ≫ Subfunctor₂.ι _ =
@@ -130,7 +130,22 @@ lemma w (a : α) : t r a ≫ ρ r a = l r a ≫ b r a := by
   rw [← cancel_mono (Subfunctor₂.ι _)]
   cat_disch
 
-lemma isPullback (a : α) : IsPullback (t r a) (l r a) (ρ r a) (b r a) := sorry
+set_option backward.defeqAttrib.useBackward true in
+lemma isPullback (a : α) : IsPullback (t r a) (l r a) (ρ r a) (b r a) where
+  w := w r a
+  isLimit' :=
+    ⟨evaluationJointlyReflectsLimits _
+      (fun U ↦ (isLimitMapConePullbackConeEquiv _ _).symm
+        (evaluationJointlyReflectsLimits _
+          (fun V ↦ (isLimitMapConePullbackConeEquiv _ _).symm (by
+            refine (IsPullback.isLimit ?_)
+            rw [Types.isPullback_iff]
+            refine ⟨NatTrans.congr_app (NatTrans.congr_app (w r a) U) V,
+              ?_, ?_⟩
+            · dsimp
+              sorry
+            · dsimp
+              sorry))))⟩
 
 lemma isPushout (a : α) : IsPushout (t r a) (l r a) (ρ r a) (b r a) := sorry
 
