@@ -176,16 +176,12 @@ def toFunctor (A : Subfunctor₂ F) : C ⥤ D ⥤ Type w where
 def ι (A : Subfunctor₂ F) : A.toFunctor ⟶ F where
   app U := { app V := ↾Subtype.val }
 
-<<<<<<< HEAD
-instance (A : Subfunctor₂ F) : Mono A.ι := sorry
-=======
 open ConcreteCategory in
 instance (A : Subfunctor₂ F) : Mono A.ι :=
   ⟨@fun _ _ _ e =>
     NatTrans.ext <| funext fun U => NatTrans.ext <| funext fun V =>
       hom_ext _ _ fun x => Subtype.ext <|
         congr_hom (congr_app (congr_app e U) V) x⟩
->>>>>>> 3382069 (Complete CompleteLattice instance and lattice lemmas for Subfunctor2)
 
 variable (F) in
 @[simps]
