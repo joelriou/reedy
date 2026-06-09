@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2026 Joël Riou. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Joël Riou
+Authors: Joël Riou, Yun Liu
 -/
 module
 
@@ -27,7 +27,8 @@ def MorphismProperty.ofArrowObj (P : ObjectProperty (Arrow C)) : MorphismPropert
 
 lemma MorphismProperty.isStableUnderRetracts_arrowObj_iff (P : MorphismProperty C) :
     (arrowObj P).IsStableUnderRetracts ↔ P.IsStableUnderRetracts :=
-  sorry
+    ⟨fun h => ⟨fun hfg hg => h.of_retract hfg hg⟩,
+    fun h => ⟨fun {A B} hAB hB => h.of_retract (f := A.hom) (g := B.hom) hAB hB⟩⟩
 
 instance (P : MorphismProperty C) [P.IsStableUnderRetracts] :
     (MorphismProperty.arrowObj P).IsStableUnderRetracts := by
