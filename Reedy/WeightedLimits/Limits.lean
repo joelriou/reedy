@@ -14,3 +14,5 @@ public import Mathlib.CategoryTheory.Limits.Preserves.FunctorCategory
 -/
 
 -- TODO: dualize definitions in `WeightedLimits/Colimits.lean`
+-- it is probably better to wait that the `Colimits.lean` file
+-- is in a satisfactory state before attempting to dualize this
