@@ -27,7 +27,7 @@ def MorphismProperty.ofArrowObj (P : ObjectProperty (Arrow C)) : MorphismPropert
 
 lemma MorphismProperty.isStableUnderRetracts_arrowObj_iff (P : MorphismProperty C) :
     (arrowObj P).IsStableUnderRetracts ↔ P.IsStableUnderRetracts :=
-  sorry
+  ⟨fun h ↦ ⟨h.of_retract⟩, fun h ↦ ⟨h.of_retract⟩⟩
 
 instance (P : MorphismProperty C) [P.IsStableUnderRetracts] :
     (MorphismProperty.arrowObj P).IsStableUnderRetracts := by
