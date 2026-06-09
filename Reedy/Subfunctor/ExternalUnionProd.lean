@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2026 Joël Riou. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Joël Riou, Aras Ergus
+Authors: Joël Riou
 -/
 module
 
@@ -74,34 +74,11 @@ abbrev externalProduct (F : C ⥤ Type w₁) (G : D ⥤ Type w₂) :
     C ⥤ D ⥤ Type max w₁ w₂ :=
   (externalProductFunctor.obj F).obj G
 
+set_option backward.defeqAttrib.useBackward true in
+attribute [local simp] externalProduct in
 def fromExternalProductCoyonedaObjOpYonedaObj (X : C) :
-    externalProduct (coyoneda.obj (op X)) (yoneda.obj X) ⟶ yoneda := by
-  refine { app := ?_, naturality := ?_ }
-  · intro T
-    refine { app := ?_, naturality := ?_ }
-    · intro S
-      exact TypeCat.ofHom fun ⟨f₁, f₂⟩ => f₂ ≫ f₁
-    · intros T' S' f
-      simp only [externalProduct, externalProductFunctor, postcompose₂'Obj, postcompose₂'ObjObj,
-        whiskeringLeft, Functor.comp, CategoryStruct.comp, TypeCat.Fun.comp, yoneda_obj_map,
-        TypeCat.ofHom, ConcreteCategory.ofHom, Quiver.Hom.unop,
-        TypeCat.prod_obj_map, ConcreteCategory.hom, TypeCat.Fun.coe_mk]
-      apply TypeCat.Hom.ext
-      rw [TypeCat.Fun.mk.injEq]
-      apply funext
-      intro ⟨f₁, f₂⟩
-      simp only [Function.comp_apply, Category.assoc]
-  · intros S T f
-    simp only [externalProduct, externalProductFunctor, postcompose₂'Obj, postcompose₂'ObjObj,
-      whiskeringLeft, whiskerLeft, yoneda, coyoneda, TypeCat.prod, Functor.comp,
-      ConcreteCategory.hom, CategoryStruct.comp, NatTrans.vcomp, flip_obj_map, TypeCat.Fun.comp]
-    apply NatTrans.ext
-    simp only
-    apply funext
-    intro Z
-    ext ⟨f₁, f₂⟩
-    simp only [Function.comp_apply, TypeCat.ofHom, ConcreteCategory.ofHom, Category.assoc]
-    rfl
+    externalProduct (coyoneda.obj (op X)) (yoneda.obj X) ⟶ yoneda where
+  app T := { app S := ↾(fun x ↦ x.2 ≫ x.1) }
 
 end FunctorToTypes
 
