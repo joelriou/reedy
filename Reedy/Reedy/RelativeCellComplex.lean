@@ -7,6 +7,7 @@ module
 
 public import Mathlib.AlgebraicTopology.RelativeCellComplex.Basic
 public import Mathlib.CategoryTheory.Limits.Types.Pullbacks
+public import Mathlib.CategoryTheory.Limits.Types.Pushouts
 public import Reedy.Reedy.Basic
 public import Reedy.Subfunctor.ExternalUnionProd
 
@@ -147,7 +148,23 @@ lemma isPullback (a : α) : IsPullback (t r a) (l r a) (ρ r a) (b r a) where
             · dsimp
               sorry))))⟩
 
-lemma isPushout (a : α) : IsPushout (t r a) (l r a) (ρ r a) (b r a) := sorry
+set_option backward.defeqAttrib.useBackward true in
+lemma isPushout (a : α) : IsPushout (t r a) (l r a) (ρ r a) (b r a) where
+  w := w r a
+  isColimit' :=
+    ⟨evaluationJointlyReflectsColimits _
+      (fun U ↦ (isColimitMapCoconePushoutCoconeEquiv _ _).symm
+        (evaluationJointlyReflectsColimits _
+          (fun V ↦ (isColimitMapCoconePushoutCoconeEquiv _ _).symm (by
+            refine (IsPushout.isColimit ?_)
+            dsimp
+            apply +allowSynthFailures Types.isPushout_of_isPullback_of_mono'
+            · exact ((isPullback r a).map ((evaluation ..).obj U)).map ((evaluation ..).obj V)
+            · rw [mono_iff_injective]
+              rintro ⟨x, _⟩ ⟨y, _⟩ h
+              rwa [Subtype.ext_iff] at h ⊢
+            · sorry
+            · sorry))))⟩
 
 end relativeCellComplex
 
