@@ -152,8 +152,8 @@ def range : Subfunctor₂ G where
     change (F.map g ≫ f.app _).app V a = (f.app _ ≫ G.map g).app V a
     simp
   map₂ U _ _ g := by
-    rintro _ ⟨a,rfl⟩
-    exact ⟨(F.obj U).map g a, CategoryTheory.NatTrans.naturality_apply _ _ _⟩
+    rintro _ ⟨_, rfl⟩
+    exact ⟨(F.obj U).map g _, CategoryTheory.NatTrans.naturality_apply _ _ _⟩
 
 variable (F) in
 lemma range_id : range (𝟙 F) = ⊤ := by aesop
