@@ -69,6 +69,54 @@ abbrev Cell (a : α) := { X : C // r.deg X = a }
 
 def basicCell (a : α) (c : r.Cell a) := (r.externalUnionProd c.val).ι
 
+noncomputable abbrev sigmaExternalUnionProd (a : α) : C ⥤ Cᵒᵖ ⥤ Type u :=
+  ∐ fun (c : r.Cell a) ↦ (r.externalUnionProd c).toFunctor
+
+noncomputable abbrev ιSigmaExternalUnionProd {a : α} (c : r.Cell a) :
+    (r.externalUnionProd c).toFunctor ⟶ sigmaExternalUnionProd r a :=
+  Sigma.ι (fun (c : r.Cell a) ↦ (r.externalUnionProd c).toFunctor) c
+
+noncomputable abbrev sigmaExternalProduct (a : α) : C ⥤ Cᵒᵖ ⥤ Type u :=
+  ∐ fun (c : r.Cell a) ↦
+    FunctorToTypes.externalProduct (coyoneda.obj (op c.val)) (yoneda.obj c.val)
+
+noncomputable abbrev ιSigmaExternalProduct {a : α} (c : r.Cell a) :
+    FunctorToTypes.externalProduct (coyoneda.obj (op c.val)) (yoneda.obj c.val) ⟶
+      sigmaExternalProduct r a :=
+  Sigma.ι (fun (c : r.Cell a) ↦
+    FunctorToTypes.externalProduct (coyoneda.obj (op c.val)) (yoneda.obj c.val)) c
+
+namespace relativeCellComplex
+
+noncomputable def t (a : α) : r.sigmaExternalUnionProd a ⟶ (r.skYoneda a).toFunctor :=
+  Sigma.desc (fun c ↦ Subfunctor₂.lift (Subfunctor₂.ι _ ≫
+    fromExternalProductCoyonedaObjOpYonedaObj c.val) sorry)
+
+noncomputable def b (a : α) : r.sigmaExternalProduct a ⟶ (r.skYoneda (Order.succ a)).toFunctor :=
+  Sigma.desc (fun c ↦ Subfunctor₂.lift
+    (fromExternalProductCoyonedaObjOpYonedaObj c.val) sorry)
+
+noncomputable def l (a : α) : r.sigmaExternalUnionProd a ⟶ r.sigmaExternalProduct a :=
+  Limits.Sigma.map (fun x ↦ (r.externalUnionProd x).ι)
+
+@[reassoc (attr := simp)]
+lemma ιSigmaExternalUnionProd_l {a : α} (c : r.Cell a) :
+    r.ιSigmaExternalUnionProd c ≫ l r a =
+      r.basicCell a c ≫ r.ιSigmaExternalProduct c := sorry
+
+abbrev ρ (a : α) : (r.skYoneda a).toFunctor ⟶ (r.skYoneda (Order.succ a)).toFunctor :=
+  Subfunctor₂.homOfLE (r.monotone_skYoneda (Order.le_succ a))
+
+@[reassoc]
+lemma w (a : α) : t r a ≫ ρ r a = l r a ≫ b r a := sorry
+
+lemma isPullback (a : α) : IsPullback (t r a) (l r a) (ρ r a) (b r a) := sorry
+
+lemma isPushout (a : α) : IsPushout (t r a) (l r a) (ρ r a) (b r a) := sorry
+
+end relativeCellComplex
+
+open relativeCellComplex in
 set_option backward.defeqAttrib.useBackward true in
 -- C.4.13 in Riehl-Verity, *Elements of ∞-category theory*
 noncomputable def relativeCellComplex [NoMaxOrder α] :
@@ -90,20 +138,11 @@ noncomputable def relativeCellComplex [NoMaxOrder α] :
       cofan₂ := _
       isColimit₁ := coproductIsCoproduct _
       isColimit₂ := coproductIsCoproduct _
-      m := Limits.Sigma.map (fun x ↦ (r.externalUnionProd x).ι)
-      g₁ := by
-        refine Sigma.desc (fun x ↦ ?_)
-        dsimp
-        -- needs a version of `SSet.Subcomplex.lift` for sub-bi-functors
-        sorry
-      g₂ := by
-        refine Sigma.desc (fun x ↦ ?_)
-        dsimp
-        -- use `FunctorToTypes.fromExternalProductCoyonedaObjOpYonedaObj x.val`
-        sorry
-      hm := sorry
+      m := l r a
+      g₁ := t r a
+      g₂ := b r a
 -- see https://github.com/leanprover-community/mathlib4/pull/38530 for similar proofs
-      isPushout := sorry }
+      isPushout := isPushout r a }
 
 -- See https://github.com/joelriou/topcat-model-category/blob/2e3704c3bb65152d955eeea0a10c24b6bb8c41e8/TopCatModelCategory/CellComplex.lean#L136
 -- for the "image" of a relative cell complex by a functor which preserves colimits
