@@ -1,3 +1,4 @@
+import Reedy.Adjunction.ParametrizedColimits
 import Reedy.Arrow.MkFunctor
 import Reedy.Arrow.ObjectProperty
 import Reedy.KanExtension.FullyFaithful
