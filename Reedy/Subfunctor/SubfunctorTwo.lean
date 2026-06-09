@@ -40,6 +40,7 @@ structure Subfunctor₂ where
 instance : PartialOrder (Subfunctor₂ F) :=
   PartialOrder.lift Subfunctor₂.obj (fun _ _ ↦ Subfunctor₂.ext)
 
+-- claim https://github.com/joelriou/reedy/issues/13 when working on this
 -- the proofs should be similar to the similar definition in `CategoryTheory.Subfunctor.Basic`
 instance : CompleteLattice (Subfunctor₂ F) where
   sup F G :=

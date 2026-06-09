@@ -14,6 +14,10 @@ public import Mathlib.CategoryTheory.Limits.Preserves.FunctorCategory
 
 -/
 
+-- When working on this file, claim the following issue:
+-- https://github.com/joelriou/reedy/issues/12
+
+
 @[expose] public section
 
 universe w v u
@@ -167,6 +171,7 @@ instance (F : J ⥤ C) {K : Type*} [Category* K] [HasColimitsOfShape K (Type w)]
     PreservesColimitsOfShape K (weightedColim.flip.obj F : (Jᵒᵖ ⥤ Type w) ⥤ C) := by
   -- strategy: show that `weightedColim` is a left bifunctor in a parametrized
   -- adjunction and dualize the result in `CategoryTheory.Adjunction.ParametrizedLimits`
+  -- see https://github.com/joelriou/reedy/issues/11
   sorry
 
 end
