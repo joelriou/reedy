@@ -74,10 +74,11 @@ abbrev externalProduct (F : C ⥤ Type w₁) (G : D ⥤ Type w₂) :
     C ⥤ D ⥤ Type max w₁ w₂ :=
   (externalProductFunctor.obj F).obj G
 
+set_option backward.defeqAttrib.useBackward true in
+attribute [local simp] externalProduct in
 def fromExternalProductCoyonedaObjOpYonedaObj (X : C) :
-    externalProduct (coyoneda.obj (op X)) (yoneda.obj X) ⟶ yoneda := by
-  -- this should be given by the composition of morphisms
-  sorry
+    externalProduct (coyoneda.obj (op X)) (yoneda.obj X) ⟶ yoneda where
+  app T := { app S := ↾(fun x ↦ x.2 ≫ x.1) }
 
 end FunctorToTypes
 
