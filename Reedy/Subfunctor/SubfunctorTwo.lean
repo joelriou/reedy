@@ -143,7 +143,7 @@ end
 section
 
 variable {G} (f : F ⟶ G)
-
+@[simps]
 def range : Subfunctor₂ G where
   obj U V := Set.range ((f.app U).app V)
   map₁ := sorry
