@@ -66,6 +66,8 @@ instance (P : Jᵒᵖ ⥤ Type w) {K : Type*} [Category* K] [HasColimitsOfShape 
 
 instance (F : J ⥤ C) {K : Type*} [Category* K] [HasColimitsOfShape K (Type w)] :
     PreservesColimitsOfShape K (weightedColim.flip.obj F : (Jᵒᵖ ⥤ Type w) ⥤ C) := by
+  -- strategy: show that `weightedColim` is a left bifunctor in a parametrized
+  -- adjunction and dualize the result in `CategoryTheory.Adjunction.ParametrizedLimits`
   sorry
 
 -- A.6 (iv)
