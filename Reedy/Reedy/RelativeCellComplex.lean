@@ -67,7 +67,7 @@ abbrev externalUnionProd (X : C) :
 
 abbrev Cell (a : α) := { X : C // r.deg X = a }
 
-def basicCell (a : α) (c : r.Cell a) := (r.externalUnionProd c.val).ι
+abbrev basicCell (a : α) (c : r.Cell a) := (r.externalUnionProd c.val).ι
 
 noncomputable abbrev sigmaExternalUnionProd (a : α) : C ⥤ Cᵒᵖ ⥤ Type u :=
   ∐ fun (c : r.Cell a) ↦ (r.externalUnionProd c).toFunctor
@@ -99,16 +99,36 @@ noncomputable def b (a : α) : r.sigmaExternalProduct a ⟶ (r.skYoneda (Order.s
 noncomputable def l (a : α) : r.sigmaExternalUnionProd a ⟶ r.sigmaExternalProduct a :=
   Limits.Sigma.map (fun x ↦ (r.externalUnionProd x).ι)
 
+
+@[reassoc (attr := simp)]
+lemma ιSigmaExternalUnionProd_t {a : α} (c : r.Cell a) :
+    r.ιSigmaExternalUnionProd c ≫ t r a ≫ Subfunctor₂.ι _ =
+      (r.externalUnionProd c).ι ≫ fromExternalProductCoyonedaObjOpYonedaObj c.val := by
+  simp [Sigma.ι_desc_assoc, t]
+
+@[reassoc (attr := simp)]
+lemma ιSigmaExternalProduct_b {a : α} (c : r.Cell a) :
+    r.ιSigmaExternalProduct c ≫ b r a ≫ Subfunctor₂.ι _ =
+      fromExternalProductCoyonedaObjOpYonedaObj c.val := by
+  simp [Sigma.ι_desc_assoc, b]
+
 @[reassoc (attr := simp)]
 lemma ιSigmaExternalUnionProd_l {a : α} (c : r.Cell a) :
     r.ιSigmaExternalUnionProd c ≫ l r a =
-      r.basicCell a c ≫ r.ιSigmaExternalProduct c := sorry
+      r.basicCell a c ≫ r.ιSigmaExternalProduct c := by
+  simp [l, ιSigmaExternalProduct]
 
 abbrev ρ (a : α) : (r.skYoneda a).toFunctor ⟶ (r.skYoneda (Order.succ a)).toFunctor :=
   Subfunctor₂.homOfLE (r.monotone_skYoneda (Order.le_succ a))
 
+@[reassoc (attr := simp)]
+lemma ρ_ι (a : α) : ρ r a ≫ Subfunctor₂.ι _ = Subfunctor₂.ι _ := rfl
+
+set_option backward.defeqAttrib.useBackward true in
 @[reassoc]
-lemma w (a : α) : t r a ≫ ρ r a = l r a ≫ b r a := sorry
+lemma w (a : α) : t r a ≫ ρ r a = l r a ≫ b r a := by
+  rw [← cancel_mono (Subfunctor₂.ι _)]
+  cat_disch
 
 lemma isPullback (a : α) : IsPullback (t r a) (l r a) (ρ r a) (b r a) := sorry
 

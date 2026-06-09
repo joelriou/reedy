@@ -115,6 +115,8 @@ def toFunctor (A : Subfunctor₂ F) : C ⥤ D ⥤ Type w where
 def ι (A : Subfunctor₂ F) : A.toFunctor ⟶ F where
   app U := { app V := ↾Subtype.val }
 
+instance (A : Subfunctor₂ F) : Mono A.ι := sorry
+
 variable (F) in
 @[simps]
 def toFunctorFunctor : Subfunctor₂ F ⥤ C ⥤ D ⥤ Type w where
