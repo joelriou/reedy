@@ -33,19 +33,24 @@ namespace WeightedCocone
 
 variable {P : Jᵒᵖ ⥤ Type w} {F : J ⥤ C}
 
+protected abbrev ι (c : WeightedCocone P F) {j : J} (x : P.obj (op j)) :
+    F.obj j ⟶ c.pt :=
+  (Cocone.ι c).app (op (Functor.elementsMk _ _ x))
+
+variable (pt : C) (ι : ∀ ⦃j : J⦄ (_ : P.obj (op j)), F.obj j ⟶ pt)
+  (hι : ∀ ⦃j₁ j₂ : J⦄ (x : P.obj (op j₁)) (f : j₂ ⟶ j₁),
+    F.map f ≫ ι x = ι (P.map f.op x))
 set_option backward.defeqAttrib.useBackward true in
+
 @[simps pt]
-def mk (pt : C) (ι : ∀ ⦃j : J⦄ (_ : P.obj (op j)), F.obj j ⟶ pt)
-    (hι : ∀ ⦃j₁ j₂ : J⦄ (x : P.obj (op j₁)) (f : j₂ ⟶ j₁),
-        F.map f ≫ ι x = ι (P.map f.op x)) :
-    WeightedCocone P F where
+def mk : WeightedCocone P F where
   pt := pt
   ι.app x := ι x.unop.2
   ι.naturality x₁ x₂ f := by simpa using hι (x₂.unop.2) f.unop.1.unop
 
-protected abbrev ι (c : WeightedCocone P F) {j : J} (x : P.obj (op j)) :
-    F.obj j ⟶ c.pt :=
-  (Cocone.ι c).app (op (Functor.elementsMk _ _ x))
+@[simp]
+lemma mk_ι {j : J} (x : P.obj (op j)) :
+    (mk pt ι hι).ι x = ι x := rfl
 
 protected abbrev IsColimit (c : WeightedCocone P F) := Limits.IsColimit c
 
@@ -97,18 +102,27 @@ noncomputable def weightedColimObjObjι
     F.obj j ⟶ (weightedColim.obj P).obj F :=
   colimit.ι ((CategoryOfElements.π P).leftOp ⋙ F) (op (Functor.elementsMk _ _ x))
 
-@[simps]
-noncomputable def weightedColimCocone (P : Jᵒᵖ ⥤ Type w) (F : J ⥤ C) :
-    WeightedCocone P F where
-  pt := (weightedColim.obj P).obj F
-  ι.app x := weightedColimObjObjι P F x.unop.2
-  ι.naturality := sorry
+@[reassoc (attr := simp)]
+noncomputable def weightedColimObjObj_w
+    (P : Jᵒᵖ ⥤ Type w) (F : J ⥤ C) ⦃j₁ j₂ : J⦄ (x : P.obj (op j₁))
+    (f : j₂ ⟶ j₁) :
+    F.map f ≫ weightedColimObjObjι P F x =
+      weightedColimObjObjι P F (P.map f.op x) := by
+  let g : Functor.elementsMk _ _ x ⟶ Functor.elementsMk _ _ (P.map f.op x) :=
+    ⟨f.op, rfl⟩
+  exact colimit.w ((CategoryOfElements.π P).leftOp ⋙ F) g.op
+
+noncomputable abbrev weightedColimCocone (P : Jᵒᵖ ⥤ Type w) (F : J ⥤ C) :
+    WeightedCocone P F :=
+  WeightedCocone.mk ((weightedColim.obj P).obj F)
+    (fun j x ↦ weightedColimObjObjι P F x)
+    (fun j₁ j₂ x f ↦ by simp)
 
 noncomputable def isColimitWeightedColimCocone (P : Jᵒᵖ ⥤ Type w) (F : J ⥤ C) :
-    (weightedColimCocone P F).IsColimit  :=
+    (weightedColimCocone P F).IsColimit :=
   colimit.isColimit _
 
-noncomputable def weightedColimitObjObjIsoOfIsColimit
+noncomputable def WeightedCocone.IsColimit.iso
     {P : Jᵒᵖ ⥤ Type w} {F : J ⥤ C} {c : WeightedCocone P F}
     (hc : c.IsColimit) :
     (weightedColim.obj P).obj F ≅ c.pt :=
@@ -129,13 +143,14 @@ noncomputable def weightedColimRightAdj : (Jᵒᵖ ⥤ Type w)ᵒᵖ ⥤ C ⥤ (
   map {P₁ P₂} f := Functor.whiskerLeft _ ((Functor.whiskeringLeft ..).map f.unop.rightOp)
 
 set_option backward.defeqAttrib.useBackward true in
+attribute [local simp] Pi.lift_π in
 noncomputable def weightedColimHomEquiv (P : Jᵒᵖ ⥤ Type w) (F : J ⥤ C) (X : C) :
     ((weightedColim.obj P).obj F ⟶ X) ≃ (F ⟶ P.rightOp ⋙ piConst.obj X) where
   toFun x :=
-    { app j := Pi.lift (fun y ↦ weightedColimObjObjι P F y ≫ x)
-      naturality := sorry }
+    { app j := Pi.lift (fun y ↦ weightedColimObjObjι P F y ≫ x) }
   invFun f :=
-    (isColimitWeightedColimCocone P F).desc (fun j y ↦ f.app j ≫ Pi.π _ y) sorry
+    (isColimitWeightedColimCocone P F).desc (fun j y ↦ f.app j ≫ Pi.π _ y)
+      (fun _ _ _ g ↦ by simp [dsimp% f.naturality_assoc g] )
   left_inv := sorry
   right_inv := sorry
 
@@ -166,9 +181,11 @@ noncomputable def weightedColim₂ {J' : Type*} [Category* J'] :
 
 end
 
+set_option backward.defeqAttrib.useBackward true in
 variable (J C) in
-def weightedColim₂ObjYonedaIso [HasColimitsOfSize.{v, max u v} C] :
+noncomputable def weightedColim₂ObjYonedaIso [HasColimitsOfSize.{v, max u v} C] :
     weightedColim₂.obj yoneda ≅ 𝟭 (J ⥤ C) :=
-  sorry
+  NatIso.ofComponents (fun F ↦ NatIso.ofComponents
+    (fun j ↦ (WeightedCocone.isColimitYoneda F j).iso) sorry) sorry
 
 end CategoryTheory.Limits
