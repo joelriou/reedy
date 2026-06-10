@@ -10,7 +10,9 @@ public import Mathlib.CategoryTheory.Limits.FunctorCategory.EpiMono
 public import Mathlib.CategoryTheory.Limits.Types.Pullbacks
 public import Mathlib.CategoryTheory.Limits.Types.Pushouts
 public import Mathlib.CategoryTheory.Limits.Lattice
+public import Mathlib.CategoryTheory.Types.Monomorphisms
 public import Reedy.Reedy.Basic
+public import Reedy.Limits.FunctorCategoryMono
 public import Reedy.Subfunctor.Colimits
 public import Reedy.Subfunctor.ExternalUnionProd
 
@@ -155,7 +157,7 @@ noncomputable def b [NoMaxOrder α] (a : α) :
 noncomputable def l (a : α) : r.sigmaExternalUnionProd a ⟶ r.sigmaExternalProduct a :=
   Limits.Sigma.map (fun x ↦ (r.externalUnionProd x).ι)
 
-instance (a : α) : Mono (l r a) := sorry
+instance (a : α) : Mono (l r a) := by dsimp [l]; infer_instance
 
 @[reassoc (attr := simp)]
 lemma ιSigmaExternalUnionProd_t {a : α} (c : r.Cell a) :
