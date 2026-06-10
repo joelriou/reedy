@@ -184,8 +184,6 @@ instance (X : C) {K : Type*} [Category* K] [HasLimitsOfShape Kᵒᵖ (Type w)ᵒ
     exact isLimitOfPreserves (((evaluation Jᵒᵖ (Type w)).obj (op j)).op ⋙ piConst.obj X) hc
 
 
-#check weightedColimitAdj₂.preservesColimitsOfShape_flip_obj
-
 instance (F : J ⥤ C) {K : Type*} [Category* K] [HasColimitsOfShape K (Type w)] :
     PreservesColimitsOfShape K (weightedColim.flip.obj F : (Jᵒᵖ ⥤ Type w) ⥤ C) := by
     have h : HasLimitsOfShape Kᵒᵖ (Type w)ᵒᵖ := by
