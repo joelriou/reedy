@@ -6,6 +6,7 @@ Authors: Joël Riou, Simon Henry, Yun Liu
 module
 
 public import Mathlib.CategoryTheory.Category.Preorder
+public import Mathlib.CategoryTheory.Limits.FunctorCategory.EpiMono
 public import Mathlib.CategoryTheory.Subfunctor.Basic
 public import Mathlib.CategoryTheory.Yoneda
 
@@ -230,7 +231,11 @@ lemma range_ι (G : Subfunctor₂ F) : range G.ι = G := by aesop
 /-- The morphism `G ⟶ Subfunctor₂.range f` induced by `f : F ⟶ G`. -/
 abbrev toRange : F ⟶ (Subfunctor₂.range f).toFunctor where
   app U := { app V := ↾(fun x ↦ ⟨(f.app _).app _ x, _, rfl⟩) }
-  naturality := sorry
+  naturality := by
+    intro _ _ φ
+    ext V x
+    apply Subtype.ext
+    exact ConcreteCategory.congr_hom (NatTrans.congr_app (f.naturality φ) V) x
 
 @[simp, reassoc]
 lemma toRange_ι : toRange f ≫ (Subfunctor₂.range f).ι = f := rfl
@@ -240,16 +245,34 @@ set_option backward.defeqAttrib.useBackward true in
 lemma toRange_app_val {U : C} {V : D} (x : (F.obj U).obj V) :
     dsimp% (((toRange f).app U).app V x).val = (f.app U).app V x := rfl
 
-instance : Epi (toRange f) := sorry
+instance : Epi (toRange f) := ⟨fun g h w => by
+  ext U V ⟨_, a, rfl⟩
+  exact ConcreteCategory.congr_hom (congr_app (congr_app w U) V) a⟩
 
 instance [Mono f] : Mono (toRange f) :=
   mono_of_mono_fac (toRange_ι f)
 
-instance [Mono f] : IsIso (toRange f) :=
-  sorry
+-- test
+example [Mono f] (U : C) : Mono ((toRange f).app U) := by
+  have := mono_of_mono_fac (toRange_ι f)
+  infer_instance
+
+instance [Mono f] : IsIso (toRange f) := by
+  have := mono_of_mono_fac (toRange_ι f)
+  rw [NatTrans.isIso_iff_isIso_app]
+  intro U
+  rw [NatTrans.isIso_iff_isIso_app]
+  intro V
+  rw [isIso_iff_bijective]
+  constructor
+  · rw [← mono_iff_injective]
+    infer_instance
+  · rw [← epi_iff_surjective]
+    infer_instance
 
 lemma range_eq_top_iff : Subfunctor₂.range f = ⊤ ↔ Epi f := by
-  sorry
+  simp [NatTrans.epi_iff_epi_app, epi_iff_surjective,
+    Subfunctor₂.ext_iff, funext_iff, range_obj, top_obj, Set.range_eq_univ]
 
 lemma range_eq_top [Epi f] : Subfunctor₂.range f = ⊤ := by
   rwa [range_eq_top_iff]
@@ -262,7 +285,10 @@ variable {G} (f : F ⟶ G) {B : Subfunctor₂ G} (hf : range f ≤ B)
 
 def lift : F ⟶ B.toFunctor where
   app U := { app V := ↾(fun x ↦ ⟨(f.app _ ).app _ x, hf _ _ ⟨_, rfl⟩ ⟩) }
-  naturality := sorry
+  naturality _ _ g := by
+    ext V x
+    apply Subtype.ext
+    exact ConcreteCategory.congr_hom (NatTrans.congr_app (f.naturality g) V) x
 
 @[reassoc (attr := simp)]
 lemma lift_ι : lift f hf ≫ B.ι = f := rfl
