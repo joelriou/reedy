@@ -8,7 +8,7 @@ module
 public import Mathlib.CategoryTheory.Limits.HasLimits
 
 /-!
-# ...
+# Whiskering and the colimit functor
 
 -/
 
