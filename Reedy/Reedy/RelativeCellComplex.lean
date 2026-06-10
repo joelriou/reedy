@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2026 Joël Riou. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Joël Riou
+Authors: Joël Riou, Aras Ergus
 -/
 module
 
@@ -113,12 +113,33 @@ noncomputable abbrev ιSigmaExternalProduct {a : α} (c : r.Cell a) :
 namespace relativeCellComplex
 
 noncomputable def t (a : α) : r.sigmaExternalUnionProd a ⟶ (r.skYoneda a).toFunctor :=
-  Sigma.desc (fun c ↦ Subfunctor₂.lift (Subfunctor₂.ι _ ≫
-    fromExternalProductCoyonedaObjOpYonedaObj c.val) sorry)
+  Sigma.desc (fun ⟨X, h_X⟩ ↦ Subfunctor₂.lift (Subfunctor₂.ι _ ≫
+    fromExternalProductCoyonedaObjOpYonedaObj X) (by
+      rintro X₁ X₂ _ ⟨⟨⟨f₁, f₂⟩, h_f⟩, rfl⟩
+      rcases h_f with ⟨_, h_boundary⟩ | ⟨h_boundary, _⟩
+      · apply lt_of_le_of_lt
+        · apply r.degHom_comp_le
+        · change r.degHom f₂ < a
+          simp only [boundaryYonedaObj, Set.mem_setOf_eq, h_X] at h_boundary
+          exact h_boundary
+      · apply lt_of_le_of_lt
+        · apply r.degHom_comp_le'
+        · change r.degHom f₁ < a
+          simp only [boundaryCoyonedaObj_obj, Set.mem_setOf_eq, h_X] at h_boundary
+          exact h_boundary))
 
-noncomputable def b (a : α) : r.sigmaExternalProduct a ⟶ (r.skYoneda (Order.succ a)).toFunctor :=
-  Sigma.desc (fun c ↦ Subfunctor₂.lift
-    (fromExternalProductCoyonedaObjOpYonedaObj c.val) sorry)
+noncomputable def b [NoMaxOrder α] (a : α) :
+    r.sigmaExternalProduct a ⟶ (r.skYoneda (Order.succ a)).toFunctor :=
+  Sigma.desc (fun ⟨X, h_X⟩ ↦ Subfunctor₂.lift
+    (fromExternalProductCoyonedaObjOpYonedaObj X) (by
+      intros X₁ X₂ f h_f
+      simp only [skYoneda_obj, Order.lt_succ_iff, Set.mem_setOf_eq]
+      rcases h_f with ⟨⟨f₁, f₂⟩, h_comp⟩
+      simp only [fromExternalProductCoyonedaObjOpYonedaObj, TypeCat.hom_ofHom,
+        TypeCat.Fun.coe_mk] at h_comp
+      rw [<- h_comp, <- h_X]
+      apply r.degHom_le
+    ))
 
 noncomputable def l (a : α) : r.sigmaExternalUnionProd a ⟶ r.sigmaExternalProduct a :=
   Limits.Sigma.map (fun x ↦ (r.externalUnionProd x).ι)
@@ -130,7 +151,7 @@ lemma ιSigmaExternalUnionProd_t {a : α} (c : r.Cell a) :
   simp [Sigma.ι_desc_assoc, t]
 
 @[reassoc (attr := simp)]
-lemma ιSigmaExternalProduct_b {a : α} (c : r.Cell a) :
+lemma ιSigmaExternalProduct_b [NoMaxOrder α] {a : α} (c : r.Cell a) :
     r.ιSigmaExternalProduct c ≫ b r a ≫ Subfunctor₂.ι _ =
       fromExternalProductCoyonedaObjOpYonedaObj c.val := by
   simp [Sigma.ι_desc_assoc, b]
@@ -149,12 +170,12 @@ lemma ρ_ι (a : α) : ρ r a ≫ Subfunctor₂.ι _ = Subfunctor₂.ι _ := rfl
 
 set_option backward.defeqAttrib.useBackward true in
 @[reassoc]
-lemma w (a : α) : t r a ≫ ρ r a = l r a ≫ b r a := by
+lemma w [NoMaxOrder α] (a : α) : t r a ≫ ρ r a = l r a ≫ b r a := by
   rw [← cancel_mono (Subfunctor₂.ι _)]
   cat_disch
 
 set_option backward.defeqAttrib.useBackward true in
-lemma isPullback (a : α) : IsPullback (t r a) (l r a) (ρ r a) (b r a) where
+lemma isPullback [NoMaxOrder α] (a : α) : IsPullback (t r a) (l r a) (ρ r a) (b r a) where
   w := w r a
   isLimit' :=
     ⟨evaluationJointlyReflectsLimits _
@@ -171,7 +192,7 @@ lemma isPullback (a : α) : IsPullback (t r a) (l r a) (ρ r a) (b r a) where
               sorry))))⟩
 
 set_option backward.defeqAttrib.useBackward true in
-lemma isPushout (a : α) : IsPushout (t r a) (l r a) (ρ r a) (b r a) where
+lemma isPushout [NoMaxOrder α] (a : α) : IsPushout (t r a) (l r a) (ρ r a) (b r a) where
   w := w r a
   isColimit' :=
     ⟨evaluationJointlyReflectsColimits _
