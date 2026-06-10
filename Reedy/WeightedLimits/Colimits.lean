@@ -5,10 +5,10 @@ Authors: Joël Riou
 -/
 module
 
-public import Reedy.Adjunction.ParametrizedColimits
-public import Mathlib.CategoryTheory.Elements
 public import Mathlib.CategoryTheory.Limits.Preserves.FunctorCategory
 public import Mathlib.CategoryTheory.Limits.Preserves.Opposites
+public import Reedy.Adjunction.ParametrizedColimits
+public import Reedy.Limits.Colim
 
 /-!
 # Weighted colimits
@@ -61,8 +61,12 @@ protected abbrev IsColimit (c : WeightedCocone P F) := Limits.IsColimit c
 
 namespace IsColimit
 
-variable {c : WeightedCocone P F} (hc : c.IsColimit)
-  {Z : C} (ι : ∀ ⦃j : J⦄ (_ : P.obj (op j)), F.obj j ⟶ Z)
+variable {c : WeightedCocone P F} (hc : c.IsColimit) {Z : C}
+
+section
+
+variable
+  (ι : ∀ ⦃j : J⦄ (_ : P.obj (op j)), F.obj j ⟶ Z)
   (hι : ∀ ⦃j₁ j₂ : J⦄ (x : P.obj (op j₁)) (f : j₂ ⟶ j₁),
     F.map f ≫ ι x = ι (P.map f.op x))
 
@@ -74,11 +78,18 @@ lemma fac {j : J} (x : P.obj (op j)) :
     c.ι x ≫ hc.desc ι hι = ι x :=
   Limits.IsColimit.fac hc (WeightedCocone.mk Z ι hι) (op (Functor.elementsMk _ _ x))
 
+end
+
+include hc in
+lemma hom_ext {f g : c.pt ⟶ Z} (h : ∀ {j : J} (x : P.obj (op j)), c.ι x ≫ f = c.ι x ≫ g) :
+    f = g :=
+  Limits.IsColimit.hom_ext hc (fun _ ↦ h _)
+
 end IsColimit
 
 set_option backward.defeqAttrib.useBackward true in
 @[simps]
-protected def yoneda (F : J ⥤ C) (j : J) :
+protected abbrev yoneda (F : J ⥤ C) (j : J) :
     WeightedCocone (yoneda.obj j) F where
   pt := F.obj j
   ι.app u := F.map u.unop.2
@@ -104,7 +115,12 @@ variable [HasColimitsOfSize.{v, max u w} C]
 
 noncomputable def weightedColim : (Jᵒᵖ ⥤ Type w) ⥤ (J ⥤ C) ⥤ C where
   obj P := (Functor.whiskeringLeft _ _ _).obj (CategoryOfElements.π P).leftOp ⋙ colim
-  map := sorry
+  map {P₁ P₂} f :=
+    Functor.whiskerLeft
+      ((Functor.whiskeringLeft P₂.Elementsᵒᵖ J C).obj (CategoryOfElements.π P₂).leftOp)
+        (colim.pre (NatTrans.mapElements f).op)
+  map_id := sorry
+  map_comp := sorry
 
 noncomputable def weightedColimObjObjι
     (P : Jᵒᵖ ⥤ Type w) (F : J ⥤ C) ⦃j : J⦄ (x : P.obj (op j)) :
@@ -112,7 +128,21 @@ noncomputable def weightedColimObjObjι
   colimit.ι ((CategoryOfElements.π P).leftOp ⋙ F) (op (Functor.elementsMk _ _ x))
 
 @[reassoc (attr := simp)]
-noncomputable def weightedColimObjObj_w
+lemma weightedColim.ι_map_app {P₁ P₂ : Jᵒᵖ ⥤ Type w} (f : P₁ ⟶ P₂) (F : J ⥤ C)
+    {j : J} (x : P₁.obj (op j)) :
+    weightedColimObjObjι P₁ F x ≫ (weightedColim.map f).app F =
+      weightedColimObjObjι P₂ F (f.app _ x) := by
+  sorry
+
+@[reassoc (attr := simp)]
+lemma weightedColim.ι_obj_map (P : Jᵒᵖ ⥤ Type w) {F₁ F₂ : J ⥤ C} (f : F₁ ⟶ F₂)
+    {j : J} (x : P.obj (op j)) :
+    weightedColimObjObjι P F₁ x ≫ ((weightedColim.obj P).map f) =
+      f.app j ≫ weightedColimObjObjι P F₂ x := by
+  sorry
+
+@[reassoc (attr := simp)]
+lemma weightedColimObjObj_w
     (P : Jᵒᵖ ⥤ Type w) (F : J ⥤ C) ⦃j₁ j₂ : J⦄ (x : P.obj (op j₁))
     (f : j₂ ⟶ j₁) :
     F.map f ≫ weightedColimObjObjι P F x =
@@ -131,11 +161,27 @@ noncomputable def isColimitWeightedColimCocone (P : Jᵒᵖ ⥤ Type w) (F : J �
     (weightedColimCocone P F).IsColimit :=
   colimit.isColimit _
 
+@[ext]
+lemma weightedColim.hom_ext {P : Jᵒᵖ ⥤ Type w} {F : J ⥤ C} {Z : C}
+    {f g : (weightedColim.obj P).obj F ⟶ Z}
+    (h : ∀ {j : J} (x : P.obj (op j)),
+      weightedColimObjObjι P F x ≫ f = weightedColimObjObjι P F x ≫ g) :
+    f = g :=
+  (isColimitWeightedColimCocone P F).hom_ext h
+
 noncomputable def WeightedCocone.IsColimit.iso
     {P : Jᵒᵖ ⥤ Type w} {F : J ⥤ C} {c : WeightedCocone P F}
     (hc : c.IsColimit) :
     (weightedColim.obj P).obj F ≅ c.pt :=
   IsColimit.coconePointUniqueUpToIso (colimit.isColimit _) hc
+
+@[reassoc (attr := simp)]
+lemma WeightedCocone.IsColimit.ι_iso_hom
+    {P : Jᵒᵖ ⥤ Type w} {F : J ⥤ C} {c : WeightedCocone P F}
+    (hc : c.IsColimit) {j : J} (x : P.obj (op j)) :
+    weightedColimObjObjι P F x ≫ hc.iso.hom = c.ι x :=
+  IsColimit.comp_coconePointUniqueUpToIso_hom (colimit.isColimit _) hc
+    (op (Functor.elementsMk _ _ x))
 
 instance (P : Jᵒᵖ ⥤ Type w) {K : Type*} [Category* K] [HasColimitsOfShape K C] :
     PreservesColimitsOfShape K (weightedColim.obj P : (J ⥤ C) ⥤ C) where
@@ -215,6 +261,6 @@ variable (J C) in
 noncomputable def weightedColim₂ObjYonedaIso [HasColimitsOfSize.{v, max u v} C] :
     weightedColim₂.obj yoneda ≅ 𝟭 (J ⥤ C) :=
   NatIso.ofComponents (fun F ↦ NatIso.ofComponents
-    (fun j ↦ (WeightedCocone.isColimitYoneda F j).iso) sorry) sorry
+    (fun j ↦ (WeightedCocone.isColimitYoneda F j).iso))
 
 end CategoryTheory.Limits

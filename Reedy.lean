@@ -2,6 +2,7 @@ import Reedy.Adjunction.ParametrizedColimits
 import Reedy.Arrow.MkFunctor
 import Reedy.Arrow.ObjectProperty
 import Reedy.KanExtension.FullyFaithful
+import Reedy.Limits.Colim
 import Reedy.Limits.FunctorCategoryMono
 import Reedy.MorphismProperty.Factorization
 import Reedy.MorphismProperty.HasTwoOutOfThreeProperty
