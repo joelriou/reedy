@@ -23,6 +23,8 @@ namespace SimplexCategory
 -- C.4.4
 def reedyStructure :
     ReedyStructure (epimorphisms SimplexCategory) (monomorphisms _) ℕ where
+-- the proof should follow from ingredients in the file
+-- `Mathlib.AlgebraicTopology.SimplexCategory.Basic`
   deg := len
   lt₁ := sorry
   lt₂ := sorry
