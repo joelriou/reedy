@@ -129,6 +129,17 @@ lemma ιSigmaExternalProduct_jointly_surjective {a : α} {U : C} {V : Cᵒᵖ}
       (coproductIsCoproduct _)) x
   exact ⟨c, y, rfl⟩
 
+lemma ιSigmaExternalProduct_eq_iff
+    {a : α} {U : C} {V : Cᵒᵖ}
+    (c : r.Cell a) (x : (c.val ⟶ U) × (V.unop ⟶ c.val))
+    (d : r.Cell a) (y : (d.val ⟶ U) × (V.unop ⟶ d.val)) :
+    ((r.ιSigmaExternalProduct c).app U).app V x =
+      ((r.ιSigmaExternalProduct d).app U).app V y ↔
+    ∃ (h : c = d), y = cast (by rw [h]) x :=
+  Cofan.inj_apply_eq_iff_of_isColimit
+    (isColimitCofanMkObjOfIsColimit ((evaluation _ _).obj U ⋙ (evaluation _ _).obj V) _ _
+      (coproductIsCoproduct _)) _ _
+
 namespace relativeCellComplex
 
 noncomputable def t (a : α) : r.sigmaExternalUnionProd a ⟶ (r.skYoneda a).toFunctor :=
@@ -149,16 +160,13 @@ noncomputable def t (a : α) : r.sigmaExternalUnionProd a ⟶ (r.skYoneda a).toF
 
 noncomputable def b [NoMaxOrder α] (a : α) :
     r.sigmaExternalProduct a ⟶ (r.skYoneda (Order.succ a)).toFunctor :=
-  Sigma.desc (fun ⟨X, h_X⟩ ↦ Subfunctor₂.lift
+  Sigma.desc (fun ⟨X, hX⟩ ↦ Subfunctor₂.lift
     (fromExternalProductCoyonedaObjOpYonedaObj X) (by
-      intros X₁ X₂ f h_f
+      intros X₁ X₂ f hf
       simp only [skYoneda_obj, Order.lt_succ_iff, Set.mem_setOf_eq]
-      rcases h_f with ⟨⟨f₁, f₂⟩, h_comp⟩
-      simp only [fromExternalProductCoyonedaObjOpYonedaObj, TypeCat.hom_ofHom,
-        TypeCat.Fun.coe_mk] at h_comp
-      rw [<- h_comp, <- h_X]
-      apply r.degHom_le
-    ))
+      obtain ⟨⟨f₁, f₂⟩, rfl⟩ := hf
+      rw [← hX]
+      apply r.degHom_le))
 
 noncomputable def l (a : α) : r.sigmaExternalUnionProd a ⟶ r.sigmaExternalProduct a :=
   Limits.Sigma.map (fun x ↦ (r.externalUnionProd x).ι)
