@@ -224,7 +224,7 @@ instance (X : C) {K : Type*} [Category* K] [HasLimitsOfShape Kᵒᵖ (Type w)ᵒ
 
 instance (X : C) {K : Type*} [Category* K] [HasLimitsOfShape Kᵒᵖ (Type w)ᵒᵖ] :
     PreservesLimitsOfShape Kᵒᵖ (weightedColimRightAdj.flip.obj X : (Jᵒᵖ ⥤ Type w)ᵒᵖ ⥤ J ⥤ C) := by
-    refine ⟨@fun F ↦ ⟨fun {c} hc ↦ ⟨?_⟩ ⟩ ⟩
+    refine ⟨fun {F} ↦ ⟨fun {c} hc ↦ ⟨?_⟩ ⟩ ⟩
     apply evaluationJointlyReflectsLimits
     intro j
     have : HasColimitsOfShape Kᵒᵖᵒᵖ (Type w) := by
@@ -246,13 +246,28 @@ instance (F : J ⥤ C) {K : Type*} [Category* K] [HasColimitsOfShape K (Type w)]
 
 end
 
+section
+
+variable {J' : Type*} [Category* J']
+
 -- A.6 (iv)
 @[simps!]
-noncomputable def weightedColim₂ {J' : Type*} [Category* J'] :
+noncomputable def weightedColim₂ :
     (J' ⥤ Jᵒᵖ ⥤ Type w) ⥤ (J ⥤ C) ⥤ (J' ⥤ C) :=
   (weightedColim.{w}.flip ⋙ Functor.whiskeringRight _ _ _).flip
 
 -- show that `weightedColim₂` also preserves colimits in both variables
+-- some additional assumptions may be necessary
+
+instance (P : J' ⥤ Jᵒᵖ ⥤ Type w) {K : Type*} [Category* K] :
+    PreservesColimitsOfShape K ((weightedColim₂ (C := C)).obj P) := by
+  sorry
+
+instance (F : J ⥤ C) {K : Type*} [Category* K] :
+    PreservesColimitsOfShape K ((weightedColim₂ (J' := J')).flip.obj F) := by
+  sorry
+
+end
 
 end
 
