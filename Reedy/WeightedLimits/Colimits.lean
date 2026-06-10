@@ -27,6 +27,19 @@ namespace CategoryTheory.Limits
 
 open Opposite
 
+-- to be moved to a separate file
+section
+
+variable {J C : Type*} [Category* J] [Category* C]
+
+instance [HasColimitsOfShape J C] : HasColimitsOfShape J Cᵒᵖᵒᵖ :=
+  Adjunction.hasColimitsOfShape_of_equivalence (opOpEquivalence C).functor
+
+instance [HasColimitsOfShape J C] : HasColimitsOfShape Jᵒᵖᵒᵖ C :=
+  hasColimitsOfShape_of_equivalence (opOpEquivalence _).symm
+
+end
+
 -- See A.6 in Riehl-Verity (here, we do not need the enriched version)
 
 variable {J : Type u} [Category.{v} J] {C : Type*} [Category* C]
@@ -218,31 +231,20 @@ noncomputable def weightedColimitAdj₂ :
         homEquiv_naturality_right := sorry }
   unit_whiskerRight_map := sorry
 
-instance (X : C) {K : Type*} [Category* K] [HasLimitsOfShape Kᵒᵖ (Type w)ᵒᵖ] :
-    PreservesLimitsOfShape Kᵒᵖ ((piConst.{w}.obj X): (Type w)ᵒᵖ ⥤ C) := by
-    sorry
+instance (X : C) {K : Type*} [Category* K] [HasColimitsOfShape K (Type w)] :
+    PreservesLimitsOfShape Kᵒᵖ ((piConst.{w}.obj X)) := by
+  sorry
 
-instance (X : C) {K : Type*} [Category* K] [HasLimitsOfShape Kᵒᵖ (Type w)ᵒᵖ] :
+instance (X : C) {K : Type*} [Category* K] [HasColimitsOfShape K (Type w)] :
     PreservesLimitsOfShape Kᵒᵖ (weightedColimRightAdj.flip.obj X : (Jᵒᵖ ⥤ Type w)ᵒᵖ ⥤ J ⥤ C) := by
-    refine ⟨fun {F} ↦ ⟨fun {c} hc ↦ ⟨?_⟩ ⟩ ⟩
-    apply evaluationJointlyReflectsLimits
-    intro j
-    have : HasColimitsOfShape Kᵒᵖᵒᵖ (Type w) := by
-      rwa [← hasLimitsOfShape_opposite_iff]
-    have : PreservesLimit F ((evaluation Jᵒᵖ (Type w)).obj (op j)).op := by
-      apply preservesLimit_op
-    exact isLimitOfPreserves (((evaluation Jᵒᵖ (Type w)).obj (op j)).op ⋙ piConst.obj X) hc
-
+  refine ⟨fun {F} ↦ ⟨fun {c} hc ↦ ⟨evaluationJointlyReflectsLimits _ (fun j ↦ ?_)⟩⟩⟩
+  have : PreservesLimit F ((evaluation Jᵒᵖ (Type w)).obj (op j)).op := by
+    apply preservesLimit_op
+  exact isLimitOfPreserves (((evaluation Jᵒᵖ (Type w)).obj (op j)).op ⋙ piConst.obj X) hc
 
 instance (F : J ⥤ C) {K : Type*} [Category* K] [HasColimitsOfShape K (Type w)] :
-    PreservesColimitsOfShape K (weightedColim.flip.obj F : (Jᵒᵖ ⥤ Type w) ⥤ C) := by
-    have h : HasLimitsOfShape Kᵒᵖ (Type w)ᵒᵖ := by
-      apply +allowSynthFailures hasLimitsOfShape_op_of_hasColimitsOfShape
-      apply hasColimitsOfShape_of_equivalence (opOpEquivalence K).symm
-    apply weightedColimitAdj₂.preservesColimitsOfShape_flip_obj
-  -- strategy: show that `weightedColim` is a left bifunctor in a parametrized
-  -- adjunction and dualize the result in `CategoryTheory.Adjunction.ParametrizedLimits`
-  -- see https://github.com/joelriou/reedy/issues/11
+    PreservesColimitsOfShape K (weightedColim.flip.obj F : (Jᵒᵖ ⥤ Type w) ⥤ C) :=
+  weightedColimitAdj₂.preservesColimitsOfShape_flip_obj _ _
 
 end
 
