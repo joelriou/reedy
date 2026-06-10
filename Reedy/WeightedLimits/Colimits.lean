@@ -87,9 +87,13 @@ protected def yoneda (F : J ⥤ C) (j : J) :
     congr
     exact f.unop.2
 
-def isColimitYoneda (F : J ⥤ C) (j : J) : (WeightedCocone.yoneda F j).IsColimit  := by
+set_option backward.defeqAttrib.useBackward true in
+def isColimitYoneda (F : J ⥤ C) (j : J) : (WeightedCocone.yoneda F j).IsColimit where
   -- use that the category of elements has an initial object
-  sorry
+  desc s := WeightedCocone.ι s (𝟙 j)
+  fac s x := Cocone.w s ((Functor.Elements.isInitial j).to x.unop).op
+  uniq s m hm := by
+    simpa [Functor.Elements.initial] using hm (op (Functor.Elements.initial j))
 
 end WeightedCocone
 
