@@ -220,6 +220,7 @@ lemma isPullback [NoMaxOrder α] (a : α) : IsPullback (t r a) (l r a) (ρ r a) 
               rw [mono_iff_injective] at this
               exact this h₂
             · dsimp
+              -- https://github.com/joelriou/reedy/issues/27
               sorry))))⟩
 
 set_option backward.defeqAttrib.useBackward true in
@@ -237,7 +238,16 @@ lemma isPushout [NoMaxOrder α] (a : α) : IsPushout (t r a) (l r a) (ρ r a) (b
             · rw [mono_iff_injective]
               rintro ⟨x, _⟩ ⟨y, _⟩ h
               rwa [Subtype.ext_iff] at h ⊢
-            · sorry
+            -- https://github.com/joelriou/reedy/issues/35
+            · ext ⟨x, hx⟩
+              simp only [Order.lt_succ_iff] at hx
+              simp only [TypeCat.hom_ofHom, TypeCat.Fun.coe_mk, Set.sup_eq_union, Set.mem_union,
+                Set.mem_range, Subtype.mk.injEq, Subtype.exists, exists_prop, exists_eq_right,
+                Set.mem_univ, iff_true]
+              obtain hx | hx := hx.lt_or_eq
+              · refine Or.inl hx
+              · refine Or.inr ?_
+                sorry
             · sorry))))⟩
 
 end relativeCellComplex
