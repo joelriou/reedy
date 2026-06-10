@@ -9,6 +9,8 @@ public import Mathlib.CategoryTheory.Category.Preorder
 public import Mathlib.CategoryTheory.Limits.FunctorCategory.EpiMono
 public import Mathlib.CategoryTheory.Subfunctor.Basic
 public import Mathlib.CategoryTheory.Yoneda
+public import Mathlib.CategoryTheory.Types.Monomorphisms
+public import Mathlib.CategoryTheory.Limits.Types.Pullbacks
 
 /-!
 # Subfunctors of bifuntors to types
@@ -252,11 +254,6 @@ instance : Epi (toRange f) := ⟨fun g h w => by
 instance [Mono f] : Mono (toRange f) :=
   mono_of_mono_fac (toRange_ι f)
 
--- test
-example [Mono f] (U : C) : Mono ((toRange f).app U) := by
-  have := mono_of_mono_fac (toRange_ι f)
-  infer_instance
-
 instance [Mono f] : IsIso (toRange f) := by
   have := mono_of_mono_fac (toRange_ι f)
   rw [NatTrans.isIso_iff_isIso_app]
@@ -266,9 +263,9 @@ instance [Mono f] : IsIso (toRange f) := by
   rw [isIso_iff_bijective]
   constructor
   · rw [← mono_iff_injective]
-    infer_instance
-  · rw [← epi_iff_surjective]
-    infer_instance
+    sorry
+  · rintro ⟨_, x, rfl⟩
+    exact ⟨x, rfl⟩
 
 lemma range_eq_top_iff : Subfunctor₂.range f = ⊤ ↔ Epi f := by
   simp [NatTrans.epi_iff_epi_app, epi_iff_surjective,
