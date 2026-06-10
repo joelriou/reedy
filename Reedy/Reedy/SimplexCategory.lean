@@ -49,17 +49,13 @@ def reedyStructure :
     haveI : Subsingleton
       ((epimorphisms SimplexCategory).MapFactorizationData (monomorphisms SimplexCategory) f) := by
       refine ⟨?_⟩
-      rintro ⟨z1, p1, i1, hfac1, hepi1, hmono1⟩ ⟨z2, p2, i2, hfac2, hepi2, hmono2⟩
-      simp [monomorphisms.iff] at hmono1 hmono2
-      simp [epimorphisms.iff] at hepi1 hepi2
-      have hz1 := (@image_eq _ _ _ _ _ _ _ _ hfac1).symm
-      have hz2 := (@image_eq _ _ _ _ _ _ _ _ hfac2).symm
-      subst hz1 hz2
-      have hi : i1 = i2 := by
+      rintro ⟨z1, p1, i1, hfac1, _, _⟩ ⟨z2, p2, i2, hfac2, _, _⟩
+      obtain rfl := (@image_eq _ _ _ _ _ _ _ _ hfac1).symm
+      obtain rfl := (@image_eq _ _ _ _ _ _ _ _ hfac2).symm
+      obtain rfl : i1 = i2 := by
         rw [← image_ι_eq hfac1, image_ι_eq hfac2]
-      have hp : p1 = p2 := by
+      obtain rfl : p1 = p2 := by
         rw [← factorThruImage_eq hfac1, factorThruImage_eq hfac2]
-      subst hi hp
       rfl
     exact fun _ ↦ Subsingleton.elim _ _
 
