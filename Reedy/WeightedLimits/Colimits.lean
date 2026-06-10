@@ -87,7 +87,8 @@ protected def yoneda (F : J ⥤ C) (j : J) :
     congr
     exact f.unop.2
 
-def isColimitYoneda (F : J ⥤ C) (j : J) : (WeightedCocone.yoneda F j).IsColimit  := by
+set_option backward.defeqAttrib.useBackward true in
+def isColimitYoneda (F : J ⥤ C) (j : J) : (WeightedCocone.yoneda F j).IsColimit where
   -- use that the category of elements has an initial object
   refine
     { desc := fun s => WeightedCocone.ι s (𝟙 j)
