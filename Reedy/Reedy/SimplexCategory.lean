@@ -50,8 +50,8 @@ def reedyStructure :
       ((epimorphisms SimplexCategory).MapFactorizationData (monomorphisms SimplexCategory) f) := by
       refine ⟨?_⟩
       rintro ⟨z1, p1, i1, hfac1, _, _⟩ ⟨z2, p2, i2, hfac2, _, _⟩
-      obtain rfl := (@image_eq _ _ _ _ _ _ _ _ hfac1).symm
-      obtain rfl := (@image_eq _ _ _ _ _ _ _ _ hfac2).symm
+      obtain rfl := (image_eq hfac1).symm
+      obtain rfl := (image_eq hfac2).symm
       obtain rfl : i1 = i2 := by
         rw [← image_ι_eq hfac1, image_ι_eq hfac2]
       obtain rfl : p1 = p2 := by
