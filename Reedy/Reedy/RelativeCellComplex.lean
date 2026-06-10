@@ -6,6 +6,7 @@ Authors: Joël Riou, Aras Ergus
 module
 
 public import Mathlib.AlgebraicTopology.RelativeCellComplex.Basic
+public import Mathlib.CategoryTheory.Limits.FunctorCategory.EpiMono
 public import Mathlib.CategoryTheory.Limits.Types.Pullbacks
 public import Mathlib.CategoryTheory.Limits.Types.Pushouts
 public import Mathlib.CategoryTheory.Limits.Lattice
@@ -154,6 +155,8 @@ noncomputable def b [NoMaxOrder α] (a : α) :
 noncomputable def l (a : α) : r.sigmaExternalUnionProd a ⟶ r.sigmaExternalProduct a :=
   Limits.Sigma.map (fun x ↦ (r.externalUnionProd x).ι)
 
+instance (a : α) : Mono (l r a) := sorry
+
 @[reassoc (attr := simp)]
 lemma ιSigmaExternalUnionProd_t {a : α} (c : r.Cell a) :
     r.ιSigmaExternalUnionProd c ≫ t r a ≫ Subfunctor₂.ι _ =
@@ -197,11 +200,9 @@ lemma isPullback [NoMaxOrder α] (a : α) : IsPullback (t r a) (l r a) (ρ r a) 
             refine ⟨NatTrans.congr_app (NatTrans.congr_app (w r a) U) V,
                 fun x y ⟨h₁, h₂⟩ ↦ ?_, ?_⟩
             · dsimp at x y h₁ h₂
-              obtain ⟨cx, ⟨x, hx⟩, rfl⟩ := r.ιSigmaExternalUnionProd_jointly_surjective x
-              obtain ⟨cy, ⟨y, hy⟩, rfl⟩ := r.ιSigmaExternalUnionProd_jointly_surjective y
-              obtain rfl : cx = cy := sorry
-              obtain rfl : x = y := sorry
-              rfl
+              have : Mono (((l r a).app U).app V) := inferInstance
+              rw [mono_iff_injective] at this
+              exact this h₂
             · dsimp
               sorry))))⟩
 
