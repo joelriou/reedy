@@ -5,12 +5,9 @@ Authors: Joël Riou, Simon Henry, Yun Liu
 -/
 module
 
-public import Mathlib.CategoryTheory.Category.Preorder
 public import Mathlib.CategoryTheory.Limits.FunctorCategory.EpiMono
+public import Mathlib.CategoryTheory.Limits.Types.Pushouts
 public import Mathlib.CategoryTheory.Subfunctor.Basic
-public import Mathlib.CategoryTheory.Yoneda
-public import Mathlib.CategoryTheory.Types.Monomorphisms
-public import Mathlib.CategoryTheory.Limits.Types.Pullbacks
 
 /-!
 # Subfunctors of bifuntors to types
@@ -231,7 +228,8 @@ set_option backward.defeqAttrib.useBackward true in
 lemma range_ι (G : Subfunctor₂ F) : range G.ι = G := by aesop
 
 /-- The morphism `G ⟶ Subfunctor₂.range f` induced by `f : F ⟶ G`. -/
-abbrev toRange : F ⟶ (Subfunctor₂.range f).toFunctor where
+@[simps]
+def toRange : F ⟶ (Subfunctor₂.range f).toFunctor where
   app U := { app V := ↾(fun x ↦ ⟨(f.app _).app _ x, _, rfl⟩) }
   naturality := by
     intro _ _ φ
@@ -255,7 +253,6 @@ instance [Mono f] : Mono (toRange f) :=
   mono_of_mono_fac (toRange_ι f)
 
 instance [Mono f] : IsIso (toRange f) := by
-  have := mono_of_mono_fac (toRange_ι f)
   rw [NatTrans.isIso_iff_isIso_app]
   intro U
   rw [NatTrans.isIso_iff_isIso_app]
@@ -263,9 +260,9 @@ instance [Mono f] : IsIso (toRange f) := by
   rw [isIso_iff_bijective]
   constructor
   · rw [← mono_iff_injective]
-    sorry
-  · rintro ⟨_, x, rfl⟩
-    exact ⟨x, rfl⟩
+    infer_instance
+  · rw [← epi_iff_surjective]
+    infer_instance
 
 lemma range_eq_top_iff : Subfunctor₂.range f = ⊤ ↔ Epi f := by
   simp [NatTrans.epi_iff_epi_app, epi_iff_surjective,
