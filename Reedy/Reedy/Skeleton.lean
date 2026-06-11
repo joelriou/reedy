@@ -36,18 +36,67 @@ noncomputable def skFunctor : α ⥤ (C ⥤ D) ⥤ C ⥤ D :=
 
 section Latching
 
+variable (X : C)
+
 -- C.4.14
-noncomputable abbrev latching (X : C) : (C ⥤ D) ⥤ D :=
+noncomputable abbrev latching : (C ⥤ D) ⥤ D :=
   weightedColim.obj (r.boundaryYonedaObj X).toFunctor
 
 -- claim https://github.com/joelriou/reedy/issues/34 before working on this
-def latchingι (X : C) : r.latching X ⟶ (evaluation C D).obj X :=
+def latchingι : r.latching X ⟶ (evaluation C D).obj X :=
   -- add the isomorphism `weightedColim.obj (yoneda.obj X) ≅ (evaluation C D).obj X`
   -- in the file `Reedy/WeightedLimits/Colimits`
   sorry
 
-noncomputable def relativeLatchingSrc (X : C) : Arrow (C ⥤ D) ⥤ D :=
+noncomputable def relativeLatchingSrc : Arrow (C ⥤ D) ⥤ D :=
   pushout (Functor.whiskerLeft _ (r.latchingι X)) (Functor.whiskerRight Arrow.leftToRight _)
+
+noncomputable def relativeLatchingSrc.inl :
+    Arrow.leftFunc ⋙ (evaluation C D).obj X ⟶ r.relativeLatchingSrc X :=
+  pushout.inl _ _
+
+noncomputable def relativeLatchingSrc.inr :
+    Arrow.rightFunc ⋙ r.latching (D := D) X ⟶ r.relativeLatchingSrc X :=
+  pushout.inr _ _
+
+@[reassoc]
+lemma relativeLatchingSrc.condition :
+    Functor.whiskerLeft _ (r.latchingι X) ≫ relativeLatchingSrc.inl r (D := D) X =
+      Functor.whiskerRight Arrow.leftToRight _ ≫ relativeLatchingSrc.inr r X :=
+  pushout.condition
+
+lemma relativeLatchingSrc.isPushout :
+    IsPushout (Functor.whiskerLeft _ (r.latchingι X))
+      (Functor.whiskerRight Arrow.leftToRight _)
+      (relativeLatchingSrc.inl r (D := D) X)
+      (relativeLatchingSrc.inr r X) :=
+  IsPushout.of_hasPushout _ _
+
+section
+
+variable (X : C) {F₁ F₂ : C ⥤ D} (f : F₁ ⟶ F₂)
+
+noncomputable abbrev relativeLatchingObj : D :=
+  (r.relativeLatchingSrc X).obj (Arrow.mk f)
+
+noncomputable abbrev relativeLatchingObj.inl : F₁.obj X ⟶ r.relativeLatchingObj X f :=
+  (relativeLatchingSrc.inl r X).app (Arrow.mk f)
+
+noncomputable abbrev relativeLatchingObj.inr : (r.latching X).obj F₂ ⟶ r.relativeLatchingObj X f :=
+  (relativeLatchingSrc.inr r X).app (Arrow.mk f)
+
+lemma relativeLatchingObj.isPushout :
+    IsPushout ((r.latchingι X).app F₁) ((r.latching X).map f)
+      (relativeLatchingObj.inl r X f) (relativeLatchingObj.inr r X f) :=
+  (relativeLatchingSrc.isPushout r X).map ((evaluation _ _).obj (Arrow.mk f))
+
+@[reassoc]
+lemma relativeLatchingObj.condition :
+    (r.latchingι X).app F₁ ≫ relativeLatchingObj.inl r X f =
+      (r.latching X).map f ≫ relativeLatchingObj.inr r X f :=
+  (relativeLatchingObj.isPushout r X f).w
+
+end
 
 noncomputable def relativeLatchingMap (X : C) :
     r.relativeLatchingSrc X ⟶ Arrow.rightFunc ⋙ (evaluation C D).obj X :=
