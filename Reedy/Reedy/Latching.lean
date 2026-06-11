@@ -10,7 +10,7 @@ public import Reedy.Reedy.RelativeCellComplex
 public import Reedy.WeightedLimits.Colimits
 
 /-!
-# Skeleton
+# Latching and matching objects
 
 -/
 
@@ -30,9 +30,6 @@ namespace ReedyStructure
 
 variable (r : ReedyStructure W₁ W₂ α) {D : Type*} [Category D]
   [HasColimitsOfSize.{u, u} D]
-
-noncomputable def skFunctor : α ⥤ (C ⥤ D) ⥤ C ⥤ D :=
-  r.monotone_skYoneda.functor ⋙ Subfunctor₂.toFunctorFunctor yoneda ⋙ weightedColim₂
 
 section Latching
 
