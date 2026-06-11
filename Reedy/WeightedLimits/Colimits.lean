@@ -269,7 +269,7 @@ instance (X : C) {K : Type*} [Category* K] [HasColimitsOfShape K (Type w)] :
     apply preservesLimit_op
   exact isLimitOfPreserves (((evaluation Jᵒᵖ (Type w)).obj (op j)).op ⋙ piConst.obj X) hc
 
-instance test (F : J ⥤ C) {K : Type*} [Category* K] [HasColimitsOfShape K (Type w)] :
+instance (F : J ⥤ C) {K : Type*} [Category* K] [HasColimitsOfShape K (Type w)] :
     PreservesColimitsOfShape K (weightedColim.flip.obj F : (Jᵒᵖ ⥤ Type w) ⥤ C) :=
   weightedColimitAdj₂.preservesColimitsOfShape_flip_obj _ _
 
@@ -301,8 +301,17 @@ end
 
 end
 
+variable (C) in
+set_option backward.defeqAttrib.useBackward true in
+@[simps!]
+noncomputable def weightColimObjYonedaObjIso [HasColimitsOfSize.{v, max u v} C] (j : J) :
+    weightedColim.obj (yoneda.obj j) ≅ (evaluation J C).obj j :=
+  NatIso.ofComponents (fun F ↦
+    (WeightedCocone.isColimitYoneda F j).iso)
+
 set_option backward.defeqAttrib.useBackward true in
 variable (J C) in
+@[simps!]
 noncomputable def weightedColim₂ObjYonedaIso [HasColimitsOfSize.{v, max u v} C] :
     weightedColim₂.obj yoneda ≅ 𝟭 (J ⥤ C) :=
   NatIso.ofComponents (fun F ↦ NatIso.ofComponents

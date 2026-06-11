@@ -42,11 +42,9 @@ variable (X : C)
 noncomputable abbrev latching : (C ⥤ D) ⥤ D :=
   weightedColim.obj (r.boundaryYonedaObj X).toFunctor
 
--- claim https://github.com/joelriou/reedy/issues/34 before working on this
-def latchingι : r.latching X ⟶ (evaluation C D).obj X :=
-  -- add the isomorphism `weightedColim.obj (yoneda.obj X) ≅ (evaluation C D).obj X`
-  -- in the file `Reedy/WeightedLimits/Colimits`
-  sorry
+noncomputable def latchingι : r.latching X ⟶ (evaluation C D).obj X :=
+  weightedColim.map (r.boundaryYonedaObj X).ι ≫
+    (weightColimObjYonedaObjIso D X).hom
 
 noncomputable def relativeLatchingSrc : Arrow (C ⥤ D) ⥤ D :=
   pushout (Functor.whiskerLeft _ (r.latchingι X)) (Functor.whiskerRight Arrow.leftToRight _)
