@@ -5,14 +5,37 @@ Authors: Joël Riou
 -/
 module
 
-public import Mathlib.CategoryTheory.Elements
-public import Mathlib.CategoryTheory.Limits.Preserves.FunctorCategory
+public import Reedy.WeightedLimits.Colimits
 
 /-!
 # Weighted limits
 
 -/
 
--- TODO: dualize definitions in `WeightedLimits/Colimits.lean`
--- it is probably better to wait that the `Colimits.lean` file
--- is in a satisfactory state before attempting to dualize this
+@[expose] public section
+
+universe w
+
+namespace CategoryTheory.Limits
+
+open Opposite
+
+variable {J' : Type u} [Category.{v} J'] {C : Type*} [Category* C]
+  {J : Type*} [Category J]
+
+-- TODO: dualize the API from the `Colimits.lean` file and
+-- obtain the parametrized adjunction
+
+-- in this file the weights shall be functors `J' ⥤ Type w`
+
+noncomputable def weightedLim₂ :
+    (J' ⥤ Jᵒᵖ ⥤ Type w)ᵒᵖ ⥤ (J' ⥤ C) ⥤ (J ⥤ C) := by
+  sorry
+
+variable [HasColimitsOfSize.{w} C]
+
+def weightedLim₂Adj₂ :
+    weightedColim₂.{w} (J := J) (J' := J') (C := C) ⊣₂ weightedLim₂ :=
+  sorry
+
+end CategoryTheory.Limits
