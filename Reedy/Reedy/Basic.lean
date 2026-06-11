@@ -162,6 +162,21 @@ lemma prop_of_degHom_eq_deg_tgt {X Y : C} {f : X ⟶ Y} (hf : r.degHom f = r.deg
   obtain rfl : p = f := by simpa using fac
   exact hp
 
+lemma degHom_lt_or_of_degHom_comp_lt
+    {X Z Y : C} (f : X ⟶ Z) (g : Z ⟶ Y) (hfg : r.degHom (f ≫ g) < r.deg Z) :
+    r.degHom f < r.deg Z ∨ r.degHom g < r.deg Z := by
+  revert hfg
+  contrapose!
+  intro ⟨hf, hg⟩
+  let φ : W₁.MapFactorizationData W₂ (f ≫ g) :=
+    { Z := Z
+      i := f
+      p := g
+      fac := rfl
+      hi := r.prop_of_degHom_eq_deg_tgt (le_antisymm (r.degHom_le_deg' f) hf)
+      hp := r.prop_of_degHom_eq_deg_src (le_antisymm (r.degHom_le_deg g) hg) }
+  rw [r.degHom_eq φ]
+
 end ReedyStructure
 
 end CategoryTheory

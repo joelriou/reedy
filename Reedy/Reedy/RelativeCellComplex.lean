@@ -179,6 +179,15 @@ lemma ιSigmaExternalUnionProd_t {a : α} (c : r.Cell a) :
       (r.externalUnionProd c).ι ≫ fromExternalProductCoyonedaObjOpYonedaObj c.val := by
   simp [Sigma.ι_desc_assoc, t]
 
+set_option backward.defeqAttrib.useBackward true in
+@[simp]
+lemma ιSigmaExternalProduct_t_app_app_coe [NoMaxOrder α] {a : α} (c : r.Cell a)
+    {U : C} {V : Cᵒᵖ} (i : c.val ⟶ U) (p : V.unop ⟶ c.val) (hip) :
+    dsimp% (((t r a).app U).app V (((r.ιSigmaExternalUnionProd c).app U).app V ⟨⟨i, p⟩, hip⟩)).1 =
+      p ≫ i :=
+  ConcreteCategory.congr_hom (NatTrans.congr_app (NatTrans.congr_app
+    (ιSigmaExternalUnionProd_t r c) U) V) _
+
 @[reassoc (attr := simp)]
 lemma ιSigmaExternalProduct_b [NoMaxOrder α] {a : α} (c : r.Cell a) :
     r.ιSigmaExternalProduct c ≫ b r a ≫ Subfunctor₂.ι _ =
@@ -221,6 +230,7 @@ lemma w [NoMaxOrder α] (a : α) : t r a ≫ ρ r a = l r a ≫ b r a := by
   rw [← cancel_mono (Subfunctor₂.ι _)]
   cat_disch
 
+set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in
 lemma isPullback [NoMaxOrder α] (a : α) : IsPullback (t r a) (l r a) (ρ r a) (b r a) where
   w := w r a
@@ -238,8 +248,17 @@ lemma isPullback [NoMaxOrder α] (a : α) : IsPullback (t r a) (l r a) (ρ r a) 
               rw [mono_iff_injective] at this
               exact this h₂
             · dsimp
-              -- https://github.com/joelriou/reedy/issues/27
-              sorry))))⟩
+              intro ⟨f, hf⟩ x h
+              obtain ⟨c, ⟨i, p⟩, rfl⟩ := r.ιSigmaExternalProduct_jointly_surjective x
+              obtain rfl : f = p ≫ i := by simpa [Subtype.ext_iff] using h
+              refine ⟨((r.ιSigmaExternalUnionProd c).app U).app V ⟨(i, p), ?_⟩, ?_, ?_⟩
+              · rw [Subfunctor.mem_unionExternalProd_obj_obj_iff]
+                obtain hf | hf := r.degHom_lt_or_of_degHom_comp_lt p i
+                  (by simpa only [c.prop] using hf)
+                · exact Or.inl (by simpa)
+                · exact Or.inr (by simpa)
+              · simp [Subtype.ext_iff]
+              · simp))))⟩
 
 set_option backward.defeqAttrib.useBackward true in
 lemma degHom₁_eq_of_nonMem_range_l {a : α} {c : r.Cell a} {U : C} {V : Cᵒᵖ}
@@ -356,7 +375,6 @@ noncomputable def relativeCellComplex [NoMaxOrder α] :
       m := l r a
       g₁ := t r a
       g₂ := b r a
--- see https://github.com/leanprover-community/mathlib4/pull/38530 for similar proofs
       isPushout := isPushout r a }
 
 -- See https://github.com/joelriou/topcat-model-category/blob/2e3704c3bb65152d955eeea0a10c24b6bb8c41e8/TopCatModelCategory/CellComplex.lean#L136
