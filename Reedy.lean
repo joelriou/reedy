@@ -13,6 +13,7 @@ import Reedy.MorphismProperty.Retracts
 import Reedy.ObjectProperty.Retracts
 import Reedy.Reedy.Basic
 import Reedy.Reedy.Latching
+import Reedy.Reedy.Matching
 import Reedy.Reedy.ModelCategory
 import Reedy.Reedy.RelativeCellComplex
 import Reedy.Reedy.SimplexCategory

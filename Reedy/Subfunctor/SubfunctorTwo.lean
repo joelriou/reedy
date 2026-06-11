@@ -181,12 +181,6 @@ instance (A : Subfunctor₂ F) : Mono A.ι :=
       hom_ext _ _ fun x => Subtype.ext <|
         congr_hom (congr_app (congr_app e U) V) x⟩
 
-variable (F) in
-@[simps]
-def toFunctorFunctor : Subfunctor₂ F ⥤ C ⥤ D ⥤ Type w where
-  obj := toFunctor
-  map f := { app U := { app V := ↾(fun x ↦ ⟨x.val, leOfHom f _ _ x.prop⟩) } }
-
 section
 
 variable {A₁ A₂ : Subfunctor₂ F}
@@ -201,6 +195,17 @@ protected def eqToIso (h : A₁ = A₂) : A₁.toFunctor ≅ A₂.toFunctor wher
   inv := homOfLE h.symm.le
 
 end
+
+variable (F) in
+@[simps]
+def toFunctorFunctor : Subfunctor₂ F ⥤ C ⥤ D ⥤ Type w where
+  obj := toFunctor
+  map f := homOfLE (leOfHom f)
+
+variable (F) in
+@[simps!]
+def toOverFunctor : Subfunctor₂ F ⥤ Over F :=
+  Functor.toOver (toFunctorFunctor F) F Subfunctor₂.ι (by cat_disch)
 
 section
 
