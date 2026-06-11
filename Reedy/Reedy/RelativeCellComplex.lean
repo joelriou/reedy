@@ -140,6 +140,27 @@ lemma ιSigmaExternalProduct_eq_iff
     (isColimitCofanMkObjOfIsColimit ((evaluation _ _).obj U ⋙ (evaluation _ _).obj V) _ _
       (coproductIsCoproduct _)) _ _
 
+noncomputable abbrev sigmaExternalProductToYoneda (a : α) :
+    r.sigmaExternalProduct a ⟶ yoneda :=
+  Sigma.desc (fun c ↦ fromExternalProductCoyonedaObjOpYonedaObj c.val)
+
+noncomputable abbrev sigmaExternalUnionProdToYoneda (a : α) :
+    r.sigmaExternalUnionProd a ⟶ yoneda :=
+  Sigma.desc (fun c ↦ Subfunctor₂.ι _ ≫ fromExternalProductCoyonedaObjOpYonedaObj c.val)
+
+@[reassoc (attr := simp)]
+lemma ι_sigmaExternalUnionProdToYoneda {a : α} (c : r.Cell a) :
+    r.ιSigmaExternalUnionProd c ≫ r.sigmaExternalUnionProdToYoneda a =
+      ((r.boundaryCoyonedaObj c.val).unionExternalProd (r.boundaryYonedaObj c.val)).ι ≫
+        fromExternalProductCoyonedaObjOpYonedaObj c.val :=
+  Sigma.ι_desc ..
+
+@[reassoc (attr := simp)]
+lemma ι_sigmaExternalProductToYoneda {a : α} (c : r.Cell a) :
+    r.ιSigmaExternalProduct c ≫ r.sigmaExternalProductToYoneda a =
+      fromExternalProductCoyonedaObjOpYonedaObj c.val :=
+  Sigma.ι_desc ..
+
 namespace relativeCellComplex
 
 noncomputable def t (a : α) : r.sigmaExternalUnionProd a ⟶ (r.skYoneda a).toFunctor :=
@@ -168,16 +189,28 @@ noncomputable def b [NoMaxOrder α] (a : α) :
       rw [← hX]
       apply r.degHom_le))
 
+@[reassoc (attr := simp)]
+lemma b_ι [NoMaxOrder α] (a : α) :
+    b r a ≫ (r.skYoneda (Order.succ a)).ι = r.sigmaExternalProductToYoneda a := by
+  ext c : 1
+  simp [b, Sigma.ι_desc_assoc]
+
 noncomputable def l (a : α) : r.sigmaExternalUnionProd a ⟶ r.sigmaExternalProduct a :=
   Limits.Sigma.map (fun x ↦ (r.externalUnionProd x).ι)
 
 instance (a : α) : Mono (l r a) := by dsimp [l]; infer_instance
 
 @[reassoc (attr := simp)]
+lemma t_ι (a : α) :
+    t r a ≫ (r.skYoneda a).ι = r.sigmaExternalUnionProdToYoneda a := by
+  ext c : 1
+  simp [Sigma.ι_desc, Sigma.ι_desc_assoc, t]
+
+@[reassoc]
 lemma ιSigmaExternalUnionProd_t {a : α} (c : r.Cell a) :
     r.ιSigmaExternalUnionProd c ≫ t r a ≫ Subfunctor₂.ι _ =
       (r.externalUnionProd c).ι ≫ fromExternalProductCoyonedaObjOpYonedaObj c.val := by
-  simp [Sigma.ι_desc_assoc, t]
+  simp
 
 set_option backward.defeqAttrib.useBackward true in
 @[simp]
@@ -188,11 +221,11 @@ lemma ιSigmaExternalProduct_t_app_app_coe [NoMaxOrder α] {a : α} (c : r.Cell 
   ConcreteCategory.congr_hom (NatTrans.congr_app (NatTrans.congr_app
     (ιSigmaExternalUnionProd_t r c) U) V) _
 
-@[reassoc (attr := simp)]
+@[reassoc]
 lemma ιSigmaExternalProduct_b [NoMaxOrder α] {a : α} (c : r.Cell a) :
     r.ιSigmaExternalProduct c ≫ b r a ≫ Subfunctor₂.ι _ =
       fromExternalProductCoyonedaObjOpYonedaObj c.val := by
-  simp [Sigma.ι_desc_assoc, b]
+  simp
 
 set_option backward.defeqAttrib.useBackward true in
 @[simp]
@@ -376,9 +409,76 @@ noncomputable def relativeCellComplex [NoMaxOrder α] :
       g₂ := b r a
       isPushout := isPushout r a }
 
--- TODO: Refactor the definition above so that the cell complex structure
--- is in the category `Over yoneda` instead of the
--- category `C ⥤ Cᵒᵖ ⥤ Type u` where `yoneda` belongs.
+abbrev skYonedaForget : α ⥤ C ⥤ Cᵒᵖ ⥤ Type u :=
+  r.monotone_skYoneda.functor ⋙ Subfunctor₂.toFunctorFunctor yoneda
+
+abbrev skYonedaOver : α ⥤ Over (yoneda (C := C)) :=
+  r.monotone_skYoneda.functor ⋙ Subfunctor₂.toOverFunctor _
+
+instance : r.skYonedaForget.IsWellOrderContinuous where
+  nonempty_isColimit m hm :=
+    ⟨isColimitOfPreserves (Subfunctor₂.toFunctorFunctor _)
+      (r.monotone_skYoneda.functor.isColimitOfIsWellOrderContinuous m hm)⟩
+
+instance : r.skYonedaOver.IsWellOrderContinuous where
+  nonempty_isColimit m hm :=
+    ⟨isColimitOfReflects (Over.forget _)
+      (r.skYonedaForget.isColimitOfIsWellOrderContinuous m hm)⟩
+
+abbrev externalUnionProdOver (X : C) : Over (yoneda (C := C)) :=
+    Over.mk ((Subfunctor.unionExternalProd (r.boundaryCoyonedaObj X) (r.boundaryYonedaObj X)).ι ≫
+      fromExternalProductCoyonedaObjOpYonedaObj X)
+
+abbrev externalProductOver (X : C) : Over (yoneda (C := C)) :=
+  Over.mk (fromExternalProductCoyonedaObjOpYonedaObj X)
+
+abbrev externalUnionProdιOver (X : C) :
+    r.externalUnionProdOver X ⟶ externalProductOver X :=
+  Over.homMk (Subfunctor₂.ι _)
+
+abbrev basicCellOver (a : α) (c : r.Cell a) := r.externalUnionProdιOver c.val
+
+abbrev yonedaCocone : Cocone r.skYonedaForget where
+  pt := yoneda
+  ι.app _ := Subfunctor₂.ι _
+
+noncomputable def isColimitYonedaCocone [NoMaxOrder α] : IsColimit r.yonedaCocone :=
+  IsColimit.ofIsoColimit
+    (isColimitOfPreserves (Subfunctor₂.toFunctorFunctor _)
+      (CompleteLattice.colimitCocone r.monotone_skYoneda.functor).isColimit)
+        (Cocone.ext (Subfunctor₂.eqToIso (by simp) ≪≫ Subfunctor₂.topIso _))
+
+open relativeCellComplex in
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
+attribute [local simp] Functor.toOver Subfunctor₂.toOverFunctor in
+-- the cell complex `relativeCellComplex`, but in the category `Over yoneda`
+noncomputable def relativeCellComplexOver [NoMaxOrder α] :
+    RelativeCellComplex r.basicCellOver
+      (Over.homMk (Subfunctor₂.ι ⊥) : Over.mk (Subfunctor₂.ι ⊥) ⟶ Over.mk (𝟙 _)) where
+  F := r.skYonedaOver
+  isoBot := Over.isoMk (Subfunctor₂.eqToIso (by simp))
+  incl.app _ := Over.homMk (Subfunctor₂.ι _)
+  isColimit := isColimitOfReflects (Over.forget _) r.isColimitYonedaCocone
+  attachCells a ha :=
+    { ι := r.Cell a
+      π := id
+      cofan₁ := Cofan.mk (Over.mk (r.sigmaExternalUnionProdToYoneda a))
+        (fun c ↦ Over.homMk (r.ιSigmaExternalUnionProd c))
+      cofan₂ := Cofan.mk (Over.mk (r.sigmaExternalProductToYoneda a))
+        (fun c ↦ Over.homMk (r.ιSigmaExternalProduct c))
+      isColimit₁ :=
+        isColimitOfIsColimitCofanMkObj (Over.forget _) _ _
+          (coproductIsCoproduct _)
+      isColimit₂ :=
+        isColimitOfIsColimitCofanMkObj (Over.forget _) _ _
+          (coproductIsCoproduct _)
+      m := Over.homMk (l r a)
+      g₁ := Over.homMk (t r a)
+      g₂ := Over.homMk (b r a)
+      isPushout.w := by ext : 1; exact (isPushout r a).w
+      isPushout.isColimit' :=
+        ⟨isColimitOfIsColimitPushoutCoconeMap (Over.forget _) _ (isPushout r a).isColimit⟩ }
 
 -- See https://github.com/joelriou/topcat-model-category/blob/2e3704c3bb65152d955eeea0a10c24b6bb8c41e8/TopCatModelCategory/CellComplex.lean#L136
 -- for the "image" of a relative cell complex by a functor which preserves colimits
