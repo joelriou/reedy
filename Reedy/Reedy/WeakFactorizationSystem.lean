@@ -9,7 +9,7 @@ public import Mathlib.CategoryTheory.MorphismProperty.WeakFactorizationSystem
 public import Reedy.Arrow.ObjectProperty
 public import Reedy.MorphismProperty.Retracts
 public import Reedy.ObjectProperty.Retracts
-public import Reedy.Reedy.Skeleton
+public import Reedy.Reedy.Latching
 
 /-!
 # Weak factorization systems on the category of functors
