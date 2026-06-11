@@ -238,8 +238,46 @@ lemma isPullback [NoMaxOrder α] (a : α) : IsPullback (t r a) (l r a) (ρ r a) 
               rw [mono_iff_injective] at this
               exact this h₂
             · dsimp
-              -- https://github.com/joelriou/reedy/issues/27
-              sorry))))⟩
+              intro ⟨f, h_f⟩ fs h_eq
+              obtain ⟨c, ⟨f₁, f₂⟩, h_fs⟩ := r.ιSigmaExternalProduct_jointly_surjective fs
+              have h_comp : f = f₂ ≫ f₁ := by
+                have h_eq_f := congr_arg Subtype.val h_eq
+                change f = _ at h_eq_f
+                simp only [h_eq_f, ← h_fs]
+                change TypeCat.Hom.hom
+                    (((r.ιSigmaExternalProduct c ≫ b r a ≫
+                      Subfunctor₂.ι (r.skYoneda (Order.succ a))).app U).app V) _ = _
+                simp only [yoneda_obj_obj, ιSigmaExternalProduct_b,
+                  fromExternalProductCoyonedaObjOpYonedaObj, Functor.flip_obj_obj,
+                  TypeCat.ofHom_apply]
+              have h_comp_deg : r.degHom (f₂ ≫ f₁) < r.deg c.val := by
+                simp only [c.property, <- h_comp, h_f]
+              rcases (r.degHom_fact_lt f₂ f₁ h_comp_deg) with h_deg | h_deg <;>
+                refine ⟨((r.ιSigmaExternalUnionProd c).app U).app V ⟨⟨f₁, f₂⟩, ?_⟩, (by
+                  constructor
+                  · simp only [Subfunctor₂.toFunctor_obj_obj, Functor.flip_obj_obj, yoneda_obj_obj,
+                      Subtype.ext_iff, h_comp]
+                    change (((r.ιSigmaExternalUnionProd c ≫ t r a ≫
+                      Subfunctor₂.ι (r.skYoneda a)).app U).app V) _ = _
+                    simp only [yoneda_obj_obj, ιSigmaExternalUnionProd_t,
+                      fromExternalProductCoyonedaObjOpYonedaObj, Functor.flip_obj_obj]
+                    rfl
+                  · rw [← h_fs]
+                    change (((r.ιSigmaExternalUnionProd c ≫ l r a).app U).app V) _ = _
+                    rw [ιSigmaExternalUnionProd_l]
+                    rfl
+                )⟩
+              · apply Or.inl
+                constructor
+                · simp only [Functor.flip_obj_obj, yoneda_obj_obj, Subfunctor.top_obj,
+                    Set.top_eq_univ, Set.mem_univ]
+                · simp only [yoneda_obj_obj, boundaryYonedaObj, Set.mem_setOf_eq, h_deg]
+              · apply Or.inr
+                constructor
+                · simp only [Functor.flip_obj_obj, yoneda_obj_obj, boundaryCoyonedaObj,
+                    Set.mem_setOf_eq, h_deg]
+                · simp only [yoneda_obj_obj, Subfunctor.top_obj, Set.top_eq_univ, Set.mem_univ]
+              ))))⟩
 
 set_option backward.defeqAttrib.useBackward true in
 lemma degHom₁_eq_of_nonMem_range_l {a : α} {c : r.Cell a} {U : C} {V : Cᵒᵖ}

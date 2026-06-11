@@ -112,6 +112,43 @@ lemma degHom_le_deg' {X Y : C} (f : X ⟶ Y) :
     r.degHom f ≤ r.deg Y := by
   simpa using r.degHom_le f (𝟙 Y)
 
+lemma dec_of_deg_cod_le_deg {X Y : C} (f : X ⟶ Y) (h_deg : r.deg Y ≤ r.degHom f) : W₁ f := by
+    obtain ⟨Zf, f₁, f₂, h_f₁, h_f₂, fac_f, eq_f⟩ := r.exists_fac f
+    have h_f₂_id : MorphismProperty.identities C f₂ := by
+      by_contra h
+      rw [eq_f] at h_deg
+      exact not_lt_of_ge h_deg (r.lt₂ f₂ h_f₂ h)
+    cases h_f₂_id
+    simp only [← fac_f, Category.comp_id, h_f₁]
+
+lemma inc_of_deg_dom_le_deg {X Y : C} (f : X ⟶ Y) (h_deg : r.deg X ≤ r.degHom f) : W₂ f := by
+    obtain ⟨Zf, f₁, f₂, h_f₁, h_f₂, fac_f, eq_f⟩ := r.exists_fac f
+    have h_f₁_id : MorphismProperty.identities C f₁ := by
+      by_contra h
+      rw [eq_f] at h_deg
+      exact not_lt_of_ge h_deg (r.lt₁ f₁ h_f₁ h)
+    cases h_f₁_id
+    simp only [← fac_f, Category.id_comp, h_f₂]
+
+lemma degHom_fact_lt {X Z Y : C} (f : X ⟶ Z) (g : Z ⟶ Y) (h_comp : r.degHom (f ≫ g) < r.deg Z) :
+    r.degHom f < r.deg Z ∨ r.degHom g < r.deg Z := by
+  by_cases h_f: r.degHom f < r.deg Z
+  · exact Or.inl h_f
+  · by_cases h_g: r.degHom g < r.deg Z
+    · exact Or.inr h_g
+    · exfalso
+      rw [not_lt] at h_f h_g
+      have h_comp_contra : r.degHom (f ≫ g) = r.deg Z :=
+        r.degHom_eq
+          { Z := Z
+            i := f
+            p := g
+            fac := rfl
+            hi := r.dec_of_deg_cod_leq_deg f h_f
+            hp := r.inc_of_deg_dom_leq_deg g h_g }
+      rw [h_comp_contra] at h_comp
+      exact lt_irrefl (r.deg Z) h_comp
+
 lemma degHom_comp_le {X Y Z : C} (f : X ⟶ Y) (g : Y ⟶ Z) :
     r.degHom (f ≫ g) ≤ r.degHom f := by
   have ⟨_, f₁, f₂, _, _, h_fac, h_deg⟩ := r.exists_fac f
