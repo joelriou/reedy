@@ -219,7 +219,7 @@ noncomputable def weightedColimRightAdj : (Jᵒᵖ ⥤ Type w)ᵒᵖ ⥤ C ⥤ (
 set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in
 attribute [local simp] Pi.lift_π in
-noncomputable def weightedColimHomEquiv (P : Jᵒᵖ ⥤ Type w) (F : J ⥤ C) (X : C) :
+noncomputable def weightedColimHomEquiv {P : Jᵒᵖ ⥤ Type w} {F : J ⥤ C} {X : C} :
     ((weightedColim.obj P).obj F ⟶ X) ≃ (F ⟶ P.rightOp ⋙ piConst.obj X) where
   toFun x :=
     { app j := Pi.lift (fun y ↦ weightedColimObjObjι P F y ≫ x) }
@@ -238,14 +238,29 @@ noncomputable def weightedColimHomEquiv (P : Jᵒᵖ ⥤ Type w) (F : J ⥤ C) (
     simp only [limit.lift_π, Fan.mk_pt, Fan.mk_π_app]
     apply WeightedCocone.IsColimit.fac
 
+set_option backward.defeqAttrib.useBackward true in
+@[reassoc (attr := simp)]
+lemma ι_weightedColimHomEquiv_symm_apply {P : Jᵒᵖ ⥤ Type w} {F : J ⥤ C} {X : C}
+    (f : F ⟶ P.rightOp ⋙ piConst.obj X) ⦃j : J⦄ (x : P.obj (op j)) :
+    dsimp% weightedColimObjObjι P F x ≫ weightedColimHomEquiv.symm f =
+      f.app j ≫ Pi.π _ x :=
+  WeightedCocone.IsColimit.fac ..
+
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
+@[reassoc (attr := simp)]
+lemma weightedColimHomEquiv_apply_app_π {P : Jᵒᵖ ⥤ Type w} {F : J ⥤ C} {X : C}
+    (x : (weightedColim.obj P).obj F ⟶ X) ⦃j : J⦄ (y : P.obj (op j)) :
+    dsimp% (weightedColimHomEquiv x).app j ≫ Pi.π _ y =
+      weightedColimObjObjι P F y ≫ x := by
+  simp [weightedColimHomEquiv]
+
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 noncomputable def weightedColimitAdj₂ :
     weightedColim.{w} (J := J) (C := C) ⊣₂ weightedColimRightAdj where
   adj P :=
-    Adjunction.mkOfHomEquiv
-      { homEquiv := weightedColimHomEquiv _
-        homEquiv_naturality_left_symm := sorry
-        homEquiv_naturality_right := sorry }
-  unit_whiskerRight_map := sorry
+    Adjunction.mkOfHomEquiv { homEquiv _ _ := weightedColimHomEquiv }
 
 instance (X : C) {K : Type*} [Category* K] [HasColimitsOfShape K (Type w)] :
     PreservesLimitsOfShape Kᵒᵖ (weightedColimRightAdj.flip.obj X : (Jᵒᵖ ⥤ Type w)ᵒᵖ ⥤ J ⥤ C) := by
