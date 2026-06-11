@@ -216,6 +216,7 @@ noncomputable def weightedColimRightAdj : (Jᵒᵖ ⥤ Type w)ᵒᵖ ⥤ C ⥤ (
   obj P := piConst.{w} ⋙ (Functor.whiskeringLeft ..).obj P.unop.rightOp
   map {P₁ P₂} f := Functor.whiskerLeft _ ((Functor.whiskeringLeft ..).map f.unop.rightOp)
 
+set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in
 attribute [local simp] Pi.lift_π in
 noncomputable def weightedColimHomEquiv (P : Jᵒᵖ ⥤ Type w) (F : J ⥤ C) (X : C) :
@@ -225,8 +226,17 @@ noncomputable def weightedColimHomEquiv (P : Jᵒᵖ ⥤ Type w) (F : J ⥤ C) (
   invFun f :=
     (isColimitWeightedColimCocone P F).desc (fun j y ↦ f.app j ≫ Pi.π _ y)
       (fun _ _ _ g ↦ by simp [dsimp% f.naturality_assoc g] )
-  left_inv := sorry
-  right_inv := sorry
+  left_inv x := by
+    ext j x
+    dsimp
+    simp only [limit.lift_π, Fan.mk_pt, Fan.mk_π_app]
+    apply WeightedCocone.IsColimit.fac
+  right_inv f := by
+    ext j
+    dsimp
+    ext x
+    simp only [limit.lift_π, Fan.mk_pt, Fan.mk_π_app]
+    apply WeightedCocone.IsColimit.fac
 
 noncomputable def weightedColimitAdj₂ :
     weightedColim.{w} (J := J) (C := C) ⊣₂ weightedColimRightAdj where
