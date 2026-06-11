@@ -377,6 +377,10 @@ noncomputable def relativeCellComplex [NoMaxOrder α] :
       g₂ := b r a
       isPushout := isPushout r a }
 
+-- TODO: Refactor the definition above so that the cell complex structure
+-- is in the category `Over yoneda` instead of the
+-- category `C ⥤ Cᵒᵖ ⥤ Type u` where `yoneda` belongs.
+
 -- See https://github.com/joelriou/topcat-model-category/blob/2e3704c3bb65152d955eeea0a10c24b6bb8c41e8/TopCatModelCategory/CellComplex.lean#L136
 -- for the "image" of a relative cell complex by a functor which preserves colimits
 
