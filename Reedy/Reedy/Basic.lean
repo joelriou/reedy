@@ -88,7 +88,6 @@ lemma exists_fac {X Y : C} (f : X ⟶ Y) :
   ⟨_, _, _, (r.mapFactorizationData f).hi, (r.mapFactorizationData f).hp,
     (r.mapFactorizationData f).fac, rfl⟩
 
--- This is needed for the definition of `skYoneda` in the file `Reedy/Skeleton.lean`.
 lemma degHom_le {X Z Y : C} (f : X ⟶ Z) (g : Z ⟶ Y) :
     r.degHom (f ≫ g) ≤ r.deg Z := by
   -- the argument is essentially in the diagram of lemma C.4.7
@@ -104,6 +103,14 @@ lemma degHom_le {X Z Y : C} (f : X ⟶ Z) (g : Z ⟶ Y) :
       hp := W₂.comp_mem _ _ hh₂ hg₂ }
   rw [r.degHom_eq factfg]
   exact (r.le₁ _ hh₁).trans (r.le₂ _ hf₂)
+
+lemma degHom_le_deg {X Y : C} (f : X ⟶ Y) :
+    r.degHom f ≤ r.deg X := by
+  simpa using r.degHom_le (𝟙 X) f
+
+lemma degHom_le_deg' {X Y : C} (f : X ⟶ Y) :
+    r.degHom f ≤ r.deg Y := by
+  simpa using r.degHom_le f (𝟙 Y)
 
 lemma degHom_comp_le {X Y Z : C} (f : X ⟶ Y) (g : Y ⟶ Z) :
     r.degHom (f ≫ g) ≤ r.degHom f := by

@@ -200,6 +200,15 @@ lemma ιSigmaExternalUnionProd_l {a : α} (c : r.Cell a) :
       r.basicCell a c ≫ r.ιSigmaExternalProduct c := by
   simp [l, ιSigmaExternalProduct]
 
+set_option backward.defeqAttrib.useBackward true in
+@[simp]
+lemma ιSigmaExternalUnionProd_app_app {a : α} {c : r.Cell a} {U : C} {V : Cᵒᵖ}
+    (i : c.val ⟶ U) (p : V.unop ⟶ c.val) (hip) :
+    dsimp% ((l r a).app U).app V (((r.ιSigmaExternalUnionProd c).app U).app V ⟨⟨i, p⟩, hip⟩) =
+      ((r.ιSigmaExternalProduct c).app U).app V (i, p) :=
+  ConcreteCategory.congr_hom (NatTrans.congr_app
+    (NatTrans.congr_app (ιSigmaExternalUnionProd_l r c) U) V) _
+
 abbrev ρ (a : α) : (r.skYoneda a).toFunctor ⟶ (r.skYoneda (Order.succ a)).toFunctor :=
   Subfunctor₂.homOfLE (r.monotone_skYoneda (Order.le_succ a))
 
@@ -232,6 +241,25 @@ lemma isPullback [NoMaxOrder α] (a : α) : IsPullback (t r a) (l r a) (ρ r a) 
               -- https://github.com/joelriou/reedy/issues/27
               sorry))))⟩
 
+set_option backward.defeqAttrib.useBackward true in
+lemma degHom₁_eq_of_nonMem_range_l {a : α} {c : r.Cell a} {U : C} {V : Cᵒᵖ}
+    (i : c.val ⟶ U) (p : V.unop ⟶ c.val)
+    (hip : ((r.ιSigmaExternalProduct c).app U).app V (i, p) ∉ Set.range (((l r a).app U).app V)) :
+    r.degHom p = a := by
+  by_contra!
+  have : r.degHom p < a :=
+    lt_of_le_of_ne (by simpa [c.prop] using r.degHom_le_deg' p) this
+  refine hip ⟨((r.ιSigmaExternalUnionProd c).app U).app V ⟨⟨i, p⟩, ?_⟩, ?_⟩
+  · rw [Subfunctor.mem_unionExternalProd_obj_obj_iff]
+    exact Or.inl (by simpa [c.prop])
+  · simp
+
+lemma degHom₂_eq_of_nonMem_range_l {a : α} {c : r.Cell a} {U : C} {V : Cᵒᵖ}
+    (i : c.val ⟶ U) (p : V.unop ⟶ c.val)
+    (hip : ((r.ιSigmaExternalProduct c).app U).app V (i, p) ∉ Set.range (((l r a).app U).app V)) :
+    r.degHom i = a := by
+  sorry
+
 set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in
 lemma isPushout [NoMaxOrder α] (a : α) : IsPushout (t r a) (l r a) (ρ r a) (b r a) where
@@ -259,7 +287,14 @@ lemma isPushout [NoMaxOrder α] (a : α) : IsPushout (t r a) (l r a) (ρ r a) (b
                 let c : r.Cell a := ⟨Z, by rwa [← h]⟩
                 exact Or.inr ⟨((r.ιSigmaExternalProduct c).app _).app _ (i, p), by ext; simpa⟩
             -- https://github.com/joelriou/reedy/issues/35
-            · sorry))))⟩
+            · intro x y hx hy h
+              obtain ⟨c, ⟨i, p⟩, rfl⟩ := r.ιSigmaExternalProduct_jointly_surjective x
+              obtain ⟨c', ⟨i', p'⟩, rfl⟩ := r.ιSigmaExternalProduct_jointly_surjective y
+              dsimp at i p
+              have hp := degHom₁_eq_of_nonMem_range_l _ _ _ hx
+              have hi := degHom₂_eq_of_nonMem_range_l _ _ _ hx
+              -- show that `p ≫ i = p' ≫ i'` and use uniqueness
+              sorry))))⟩
 
 end relativeCellComplex
 

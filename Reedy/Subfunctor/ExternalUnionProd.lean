@@ -98,6 +98,17 @@ def externalProd : Subfunctor₂ (externalProduct F G) where
 def unionExternalProd : Subfunctor₂ (FunctorToTypes.externalProduct F G) :=
   externalProd ⊤ B ⊔ externalProd A ⊤
 
+lemma mem_unionExternalProd_obj_obj_iff {U : C} {V : D}
+    (x : ((externalProduct F G).obj U).obj V) :
+    x ∈ (unionExternalProd A B).obj U V ↔ x.2 ∈ B.obj V ∨ x.1 ∈ A.obj U := by
+  simp [unionExternalProd, externalProd, Set.prod]
+  rfl
+
+lemma notMem_unionExternalProd_obj_obj_iff {U : C} {V : D}
+    (x : ((externalProduct F G).obj U).obj V) :
+    x ∉ (unionExternalProd A B).obj U V ↔ x.2 ∉ B.obj V ∧ x.1 ∉ A.obj U := by
+  simp [mem_unionExternalProd_obj_obj_iff]
+
 end Subfunctor
 
 end CategoryTheory
