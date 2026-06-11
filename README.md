@@ -9,7 +9,7 @@ Dominic Verity *Elements of ∞-Category Theory* https://emilyriehl.github.io/fi
 Goals:
 1. very basic properties of Reedy categories ([`Reedy.Basic`](https://github.com/joelriou/reedy/blob/main/Reedy/Reedy/Basic.lean)), the example of the simplex category ([`Reedy.SimplexCategory`](https://github.com/joelriou/reedy/blob/main/Reedy/Reedy/SimplexCategory.lean))
 2. the skeleton filtration on the Yoneda functor `C ⥤ Cᵒᵖ ⥤ Type u` is a relative cell complex ([`Reedy.RelativeCellComplex`](https://github.com/joelriou/reedy/blob/main/Reedy/Reedy/RelativeCellComplex.lean))
-3. study of the latching/matching objects ([`Reedy.Skeleton`](https://github.com/joelriou/reedy/blob/main/Reedy/Reedy/Latching.lean))
+3. study of the latching/matching objects ([`Reedy.Latching`](https://github.com/joelriou/reedy/blob/main/Reedy/Reedy/Latching.lean), [`Reedy.Matching`](https://github.com/joelriou/reedy/blob/main/Reedy/Reedy/Matching.lean))
 4. study of the skeleton/coskeleton filtration on functors `C ⥤ D` ([`Reedy.Skeleton`](https://github.com/joelriou/reedy/blob/main/Reedy/Reedy/Skeleton.lean))
 5. a weak factorization system on `D` gives a weak factorization system on `C ⥤ D` ([`Reedy.WeakFactorizationSystem`](https://github.com/joelriou/reedy/blob/main/Reedy/Reedy/WeakFactorizationSystem.lean))
 6. the model category structure ([`Reedy.ModelCategory`](https://github.com/joelriou/reedy/blob/main/Reedy/Reedy/ModelCategory.lean))
