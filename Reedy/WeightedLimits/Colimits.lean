@@ -17,10 +17,6 @@ public import Reedy.Limits.Op
 
 -/
 
--- When working on this file, claim the following issue:
--- https://github.com/joelriou/reedy/issues/12
-
-
 @[expose] public section
 
 universe w v u

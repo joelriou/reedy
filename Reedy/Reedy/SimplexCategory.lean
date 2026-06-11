@@ -21,11 +21,8 @@ open CategoryTheory MorphismProperty
 namespace SimplexCategory
 
 -- C.4.4
--- claim https://github.com/joelriou/reedy/issues/22 if working on this
 def reedyStructure :
     ReedyStructure (epimorphisms SimplexCategory) (monomorphisms _) ℕ where
--- the proof should follow from ingredients in the file
--- `Mathlib.AlgebraicTopology.SimplexCategory.Basic`
   deg := len
   lt₁ := by
     intro n m f _ hf

@@ -312,7 +312,6 @@ lemma isPushout [NoMaxOrder α] (a : α) : IsPushout (t r a) (l r a) (ρ r a) (b
               · obtain ⟨Z, p, i, hp, hi, hpi, h⟩ := r.exists_fac f
                 let c : r.Cell a := ⟨Z, by rwa [← h]⟩
                 exact Or.inr ⟨((r.ιSigmaExternalProduct c).app _).app _ (i, p), by ext; simpa⟩
-            -- https://github.com/joelriou/reedy/issues/35
             · intro x y hx hy fac
               obtain ⟨c, ⟨i, p⟩, rfl⟩ := r.ιSigmaExternalProduct_jointly_surjective x
               obtain ⟨c', ⟨i', p'⟩, rfl⟩ := r.ιSigmaExternalProduct_jointly_surjective y
