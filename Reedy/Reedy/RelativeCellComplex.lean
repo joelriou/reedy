@@ -480,9 +480,6 @@ noncomputable def relativeCellComplexOver [NoMaxOrder α] :
       isPushout.isColimit' :=
         ⟨isColimitOfIsColimitPushoutCoconeMap (Over.forget _) _ (isPushout r a).isColimit⟩ }
 
--- See https://github.com/joelriou/topcat-model-category/blob/2e3704c3bb65152d955eeea0a10c24b6bb8c41e8/TopCatModelCategory/CellComplex.lean#L136
--- for the "image" of a relative cell complex by a functor which preserves colimits
-
 end ReedyStructure
 
 end CategoryTheory
