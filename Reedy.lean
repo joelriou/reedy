@@ -5,6 +5,7 @@ import Reedy.Arrow.Over
 import Reedy.KanExtension.FullyFaithful
 import Reedy.Limits.Colim
 import Reedy.Limits.FunctorCategoryMono
+import Reedy.Limits.Lim
 import Reedy.Limits.Op
 import Reedy.Limits.PiConst
 import Reedy.Limits.RelativeCellComplex
