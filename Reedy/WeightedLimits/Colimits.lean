@@ -191,6 +191,15 @@ noncomputable def WeightedCocone.IsColimit.iso
   IsColimit.coconePointUniqueUpToIso (colimit.isColimit _) hc
 
 @[reassoc (attr := simp)]
+lemma ι_weightedColimCocone_desc {P : Jᵒᵖ ⥤ Type w} {F : J ⥤ C} {Z : C}
+    (ι : ∀ ⦃j : J⦄ (_ : P.obj (op j)), F.obj j ⟶ Z)
+    (hι : ∀ ⦃j₁ j₂ : J⦄ (x : P.obj (op j₁)) (f : j₂ ⟶ j₁),
+      F.map f ≫ ι x = ι (P.map f.op x))
+    {j : J} (x : P.obj (op j)) :
+    weightedColimObjObjι P F x ≫ (isColimitWeightedColimCocone P F).desc ι hι = ι x :=
+  WeightedCocone.IsColimit.fac ..
+
+@[reassoc (attr := simp)]
 lemma WeightedCocone.IsColimit.ι_iso_hom
     {W : Jᵒᵖ ⥤ Type w} {F : J ⥤ C} {c : WeightedCocone W F}
     (hc : c.IsColimit) {j : J} (x : W.obj (op j)) :
