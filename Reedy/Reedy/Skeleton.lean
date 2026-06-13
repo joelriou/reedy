@@ -7,7 +7,7 @@ module
 
 public import Reedy.Arrow.MkFunctor
 public import Reedy.Arrow.Over
-public import Reedy.Limits.RelativeCellComplex
+public import Reedy.RelativeCellComplex.Map
 public import Reedy.Reedy.RelativeCellComplex
 public import Reedy.WeightedLimits.Colimits
 public import Mathlib.CategoryTheory.Limits.Shapes.Pullback.PullbackObjObj
