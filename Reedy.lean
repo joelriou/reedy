@@ -9,6 +9,7 @@ import Reedy.Limits.Lim
 import Reedy.Limits.Op
 import Reedy.Limits.Over
 import Reedy.Limits.PiConst
+import Reedy.Limits.PreservesWellOrderContinuous
 import Reedy.Limits.Pushout
 import Reedy.MorphismProperty.Factorization
 import Reedy.MorphismProperty.HasTwoOutOfThreeProperty
