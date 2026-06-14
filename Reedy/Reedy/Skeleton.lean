@@ -49,7 +49,7 @@ variable [NoMaxOrder α]
 -- ??
 local instance : HasInitial ((C ⥤ D) ⥤ (C ⥤ D)) := by infer_instance
 
-noncomputable def relativeCellComplexSk :
+noncomputable def cellComplexSk :
     RelativeCellComplex.{u} (fun j i ↦ weightedColim₂.map (r.basicCell j i))
       (initial.to (𝟭 (C ⥤ D))) :=
   (r.relativeCellComplex.map (weightedColim₂.{u} (C := D))).ofArrowIso
@@ -57,7 +57,7 @@ noncomputable def relativeCellComplexSk :
       (IsInitial.isInitialObj weightedColim₂ _ (Subfunctor₂.isInitialBot _)))
     (weightedColim₂ObjYonedaIso C D).symm (initial.hom_ext _ _)).symm
 
-noncomputable abbrev sk : α ⥤ (C ⥤ D) ⥤ (C ⥤ D) := r.relativeCellComplexSk.F
+noncomputable abbrev sk : α ⥤ (C ⥤ D) ⥤ (C ⥤ D) := r.cellComplexSk.F
 
 end ReedyStructure
 
