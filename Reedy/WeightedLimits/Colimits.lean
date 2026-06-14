@@ -19,7 +19,7 @@ public import Reedy.Limits.Op
 
 @[expose] public section
 
-universe w v u
+universe w v'' v u'' u
 
 namespace CategoryTheory.Limits
 
@@ -295,11 +295,23 @@ instance (W : J' ⥤ Jᵒᵖ ⥤ Type w) {K : Type*} [Category* K] [HasColimitsO
     ⟨evaluationJointlyReflectsColimits _
       (fun j' ↦ isColimitOfPreserves ((weightedColim (C := C)).obj (W.obj j')) hc)⟩⟩
 
+instance [HasColimitsOfSize.{v'', u''} C] (W : J' ⥤ Jᵒᵖ ⥤ Type w) :
+    PreservesColimitsOfSize.{v'', u''} ((weightedColim₂.{w} (J := J) (C := C)).obj W) where
+
 instance (F : J ⥤ C) {K : Type*} [Category* K] [HasProducts.{w} C]
     [HasColimitsOfShape K (Type w)] :
     PreservesColimitsOfShape K ((weightedColim₂ (J' := J')).flip.obj F) where
   preservesColimit := ⟨fun hc ↦ ⟨evaluationJointlyReflectsColimits _
     (fun j' ↦ (isColimitOfPreserves ((evaluation _ _ ).obj j' ⋙ weightedColim.flip.obj F) hc))⟩⟩
+
+instance {K : Type*} [Category* K] [HasProducts.{w} C] [HasColimitsOfShape K (Type w)] :
+    PreservesColimitsOfShape K (weightedColim₂ (J' := J') (J := J) (C := C)) where
+  preservesColimit := ⟨fun hc ↦
+    ⟨evaluationJointlyReflectsColimits _
+      (fun G ↦ isColimitOfPreserves (weightedColim₂.flip.obj G) hc)⟩⟩
+
+instance [HasProducts.{w} C] [HasColimitsOfSize.{v'', u''} (Type w)] :
+    PreservesColimitsOfSize.{v'', u''} (weightedColim₂ (J' := J') (J := J) (C := C)) where
 
 end
 

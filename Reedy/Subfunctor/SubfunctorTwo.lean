@@ -170,6 +170,18 @@ def toFunctor (A : Subfunctor₂ F) : C ⥤ D ⥤ Type w where
   map f :=
     { app V := ↾(fun x ↦ ⟨(F.map f).app _ x, A.map₁ _ _ x.prop⟩) }
 
+instance : Unique ((⊥ : Subfunctor₂ F).toFunctor ⟶ G) where
+  default :=
+    { app _ :=
+        { app _ := ↾(fun ⟨_, h⟩ ↦ by tauto)
+          naturality _ _ _ := by ext ⟨_, h⟩; tauto }
+      naturality _ _ _ := by ext _ ⟨_, h⟩; tauto }
+  uniq _ := by ext _ _ ⟨_, h⟩; tauto
+
+variable (F) in
+def isInitialBot : Limits.IsInitial (⊥ : Subfunctor₂ F).toFunctor :=
+  .ofUnique _
+
 @[simps]
 def ι (A : Subfunctor₂ F) : A.toFunctor ⟶ F where
   app U := { app V := ↾Subtype.val }
