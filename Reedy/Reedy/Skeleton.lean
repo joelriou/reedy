@@ -47,7 +47,7 @@ noncomputable def skFunctor : α ⥤ (C ⥤ D) ⥤ C ⥤ D :=
 variable [NoMaxOrder α]
 
 -- ??
-local instance : HasInitial ((C ⥤ D) ⥤ (C ⥤ D)) := by infer_instance
+local instance {C' : Type*} [Category* C'] : HasInitial (C' ⥤ C ⥤ D) := by infer_instance
 
 noncomputable def cellComplexSk :
     RelativeCellComplex.{u} (fun j i ↦ weightedColim₂.map (r.basicCell j i))
