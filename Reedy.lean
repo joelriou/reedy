@@ -7,6 +7,7 @@ import Reedy.Limits.Colim
 import Reedy.Limits.FunctorCategoryMono
 import Reedy.Limits.Lim
 import Reedy.Limits.Op
+import Reedy.Limits.Over
 import Reedy.Limits.PiConst
 import Reedy.Limits.Pushout
 import Reedy.MorphismProperty.Factorization
