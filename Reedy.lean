@@ -1,4 +1,5 @@
 import Reedy.Adjunction.ParametrizedColimits
+import Reedy.Arrow.Limits
 import Reedy.Arrow.MkFunctor
 import Reedy.Arrow.ObjectProperty
 import Reedy.Arrow.Over

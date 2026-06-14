@@ -25,6 +25,9 @@ abbrev ArrowLeftOver := CostructuredArrow Arrow.leftFunc X₀
 
 namespace ArrowLeftOver
 
+variable (X₀) in
+abbrev forget : ArrowLeftOver X₀ ⥤ Arrow C := CostructuredArrow.proj _ _
+
 abbrev mk {X Y : C} (f : X ⟶ Y) (g : X ⟶ X₀) : ArrowLeftOver X₀ :=
   CostructuredArrow.mk (Y := Arrow.mk f) g
 

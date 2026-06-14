@@ -7,6 +7,7 @@ module
 
 public import Reedy.Arrow.MkFunctor
 public import Reedy.Arrow.Over
+public import Reedy.Arrow.Limits
 public import Reedy.RelativeCellComplex.Map
 public import Reedy.RelativeCellComplex.Under
 public import Reedy.Reedy.RelativeCellComplex
@@ -37,6 +38,7 @@ variable {C₁ C₂ : Type*} [Category* C₁] [Category* C₂] (Ψ : C₁ ⥤ C�
 
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
+@[simps]
 def toArrowLeftOver : Over Ψ ⥤ ArrowLeftOver (Arrow.leftFunc ⋙ Ψ) where
   obj Φ :=
     ArrowLeftOver.mk
@@ -51,6 +53,26 @@ def toArrowLeftOver : Over Ψ ⥤ ArrowLeftOver (Arrow.leftFunc ⋙ Ψ) where
       ext
       rw [← Over.w f]
       dsimp)
+
+section
+
+instance {K : Type*} [Category* K] [HasColimitsOfShape K C₂] :
+    PreservesColimitsOfShape K (toArrowLeftOver Ψ) where
+  preservesColimit := ⟨fun hc ↦
+    ⟨isColimitOfReflects (ArrowLeftOver.forget _)
+      (Arrow.leftRightJointlyReflectColimit
+        (evaluationJointlyReflectsColimits _
+          (fun f ↦ isColimitOfPreserves (Over.forget _ ⋙ (evaluation _ _).obj f.left) hc))
+        (evaluationJointlyReflectsColimits _
+          (fun f ↦ isColimitOfPreserves (Over.forget _ ⋙ (evaluation _ _).obj f.right) hc)))⟩⟩
+
+instance {α : Type*} [LinearOrder α] [HasIterationOfShape α C₂] :
+    PreservesWellOrderContinuousOfShape α (toArrowLeftOver Ψ) where
+  preservesColimitsOfShape m hm := by
+    have := hasColimitsOfShape_of_isSuccLimit C₂ m hm
+    infer_instance
+
+end
 
 noncomputable abbrev toUnderArrowLeftFunc : Over Ψ ⥤ Under (Arrow.leftFunc ⋙ Ψ) :=
   toArrowLeftOver Ψ ⋙ ArrowLeftOver.pushoutFunctor
@@ -75,9 +97,6 @@ noncomputable def skFunctor : α ⥤ (C ⥤ D) ⥤ C ⥤ D :=
   r.monotone_skYoneda.functor ⋙ Subfunctor₂.toFunctorFunctor yoneda ⋙ weightedColim₂
 
 variable [NoMaxOrder α]
-
--- ??
-local instance {C' : Type*} [Category* C'] : HasInitial (C' ⥤ C ⥤ D) := by infer_instance
 
 noncomputable def cellComplexSk :
     RelativeCellComplex.{u} (fun j i ↦ weightedColim₂.map (r.basicCell j i))
@@ -109,26 +128,24 @@ instance [HasColimitsOfSize.{v'', u''} D] [HasColimitsOfSize.{v'', u''} (Type u)
     PreservesColimitsOfSize.{v'', u''}
       (Over.post (X := yoneda (C := C)) (weightedColim₂.{u} (J := C) (J' := C) (C := D))) where
 
-local instance : HasFiniteColimits D := by
-  have : HasColimitsOfSize.{0, 0} D := hasColimitsOfSizeShrink D
-  infer_instance
+noncomputable def basicCellRelativeSk (a : α) (c : r.Cell a) :=
+  (Over.post (weightedColim₂.{u} (C := D)) ⋙
+    Over.map (weightedColim₂ObjYonedaIso C D).hom ⋙ Over.toUnderArrowLeftFunc (𝟭 (C ⥤ D)) ⋙
+      Under.forget _).map (r.basicCellOver a c)
 
-section
+set_option backward.defeqAttrib.useBackward true in
+noncomputable def relativeCellComplexSk :
+    RelativeCellComplex.{u} (r.basicCellRelativeSk (D := D)) Arrow.leftToRight :=
+    (r.relativeCellComplexOver.map (Over.post (weightedColim₂.{u} (C := D)) ⋙
+      Over.map (weightedColim₂ObjYonedaIso C D).hom ⋙
+        Over.toUnderArrowLeftFunc (𝟭 (C ⥤ D)))).ofUnder.ofArrowIso (by
+    refine Arrow.isoMk ?_ ?_ sorry
+    · dsimp [ArrowLeftOver.mk, ArrowLeftOver.top]
+      sorry
+    · dsimp [ArrowLeftOver.mk, ArrowLeftOver.top]
+      sorry)
 
-instance : PreservesWellOrderContinuousOfShape α (Over.toArrowLeftOver (𝟭 (C ⥤ D))) := sorry
-
-instance : PreservesColimitsOfShape α (Over.toArrowLeftOver (𝟭 (C ⥤ D))) := sorry
-
-instance (T : Type u) :
-    PreservesColimitsOfShape (Discrete T) (Over.toArrowLeftOver (𝟭 (C ⥤ D))) := sorry
-
-instance : PreservesFiniteColimits (Over.toArrowLeftOver (𝟭 (C ⥤ D))) := sorry
-
--- this should be the relative skeleton of a map in `C ⥤ D`, functoriality in `Arrow (C ⥤ D)`
-#check (r.relativeCellComplexOver.map (Over.post (weightedColim₂.{u} (C := D)) ⋙
-  Over.map (weightedColim₂ObjYonedaIso C D).hom ⋙ Over.toUnderArrowLeftFunc (𝟭 (C ⥤ D)))).ofUnder
-
-end
+-- TODO: "compute" `basicCellRelativeSk`
 
 end ReedyStructure
 
