@@ -13,6 +13,8 @@ import Reedy.Limits.Over
 import Reedy.Limits.PiConst
 import Reedy.Limits.PreservesWellOrderContinuous
 import Reedy.Limits.Pushout
+import Reedy.Limits.PushoutObjObjObj
+import Reedy.Limits.TriplePushouts
 import Reedy.MorphismProperty.Factorization
 import Reedy.MorphismProperty.HasTwoOutOfThreeProperty
 import Reedy.MorphismProperty.Identities
