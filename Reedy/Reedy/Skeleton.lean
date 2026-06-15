@@ -5,18 +5,15 @@ Authors: Joël Riou
 -/
 module
 
-public import Reedy.Arrow.MkFunctor
-public import Reedy.Arrow.Over
-public import Reedy.Arrow.Limits
-public import Reedy.RelativeCellComplex.Map
-public import Reedy.RelativeCellComplex.Under
-public import Reedy.Reedy.RelativeCellComplex
-public import Reedy.Limits.Pushout
-public import Reedy.RelativeCellComplex.OfArrowIso
-public import Reedy.WeightedLimits.Colimits
+public import Mathlib.CategoryTheory.Limits.Shapes.Countable
+public import Reedy.Limits.Initial
 public import Reedy.Limits.PreservesWellOrderContinuous
-public import Mathlib.CategoryTheory.Limits.Shapes.Pullback.PullbackObjObj
-public import Mathlib
+public import Reedy.Limits.Pushout
+public import Reedy.Reedy.RelativeCellComplex
+public import Reedy.RelativeCellComplex.Map
+public import Reedy.RelativeCellComplex.OfArrowIso
+public import Reedy.RelativeCellComplex.Under
+public import Reedy.WeightedLimits.Colimits
 
 /-!
 # Skeleton
@@ -133,19 +130,50 @@ noncomputable def basicCellRelativeSk (a : α) (c : r.Cell a) :=
     Over.map (weightedColim₂ObjYonedaIso C D).hom ⋙ Over.toUnderArrowLeftFunc (𝟭 (C ⥤ D)) ⋙
       Under.forget _).map (r.basicCellOver a c)
 
+set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in
 noncomputable def relativeCellComplexSk :
     RelativeCellComplex.{u} (r.basicCellRelativeSk (D := D)) Arrow.leftToRight :=
     (r.relativeCellComplexOver.map (Over.post (weightedColim₂.{u} (C := D)) ⋙
       Over.map (weightedColim₂ObjYonedaIso C D).hom ⋙
         Over.toUnderArrowLeftFunc (𝟭 (C ⥤ D)))).ofUnder.ofArrowIso (by
-    refine Arrow.isoMk ?_ ?_ sorry
+    refine (Arrow.isoMk ?_ ?_ ?_).symm
+    · exact (Functor.rightUnitor _).symm ≪≫ pushout.inrIso' _ _ (by
+        refine isIso_of_isInitial ?_ ?_ _
+        all_goals
+        · exact IsInitial.functorComp
+            (IsInitial.functorMapArrow
+              (IsInitial.isInitialObj weightedColim₂ _
+                (Subfunctor₂.isInitialBot _))) _)
+    · exact (Functor.leftUnitor _).symm ≪≫
+        Functor.isoWhiskerRight ((Functor.mapArrowFunctor _ _).mapIso
+          (weightedColim₂ObjYonedaIso C D).symm) _ ≪≫ pushout.inlIso' _ _ (by
+        dsimp
+        simp only [Functor.map_id, Functor.whiskerLeft_id', Category.id_comp]
+        infer_instance)
     · dsimp [ArrowLeftOver.mk, ArrowLeftOver.top]
-      sorry
-    · dsimp [ArrowLeftOver.mk, ArrowLeftOver.top]
-      sorry)
+      simp only [Category.assoc, colimit.ι_desc, PushoutCocone.mk_pt, PushoutCocone.mk_ι_app,
+        Category.id_comp]
+      let b := Arrow.leftFunc.whiskerLeft (weightedColim₂.{u}.map (𝟙 yoneda)) ≫
+        Arrow.leftFunc.whiskerLeft (weightedColim₂ObjYonedaIso C D).hom
+      have : Arrow.leftFunc.rightUnitor.inv =
+        Arrow.leftFunc.rightUnitor.inv ≫ Arrow.leftFunc.whiskerLeft
+          (weightedColim₂ObjYonedaIso C D).inv ≫ b := by
+        dsimp [b]
+        rw [Functor.map_id, Functor.whiskerLeft_id', Category.id_comp,
+          ← Functor.whiskerLeft_comp]
+        simp
+      rw [this, Category.assoc, Category.assoc, ← pushout.condition]
+      simp only [← Category.assoc]
+      congr 1
+      ext f X
+      dsimp
+      simp only [Category.id_comp, Category.comp_id]
+      exact ((weightedColimObjYonedaObjIso D X).inv.naturality f.hom).symm)
 
 -- TODO: "compute" `basicCellRelativeSk`
+-- the cells `basicCellRelativeSk` are pushouts of more basic
+-- morphisms
 
 end ReedyStructure
 

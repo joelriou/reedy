@@ -7,6 +7,7 @@ module
 
 public import Mathlib.CategoryTheory.Comma.Arrow
 public import Mathlib.CategoryTheory.Limits.Comma
+public import Mathlib.CategoryTheory.Limits.Preserves.Shapes.Terminal
 
 /-!
 # ...
@@ -42,5 +43,11 @@ def leftRightJointlyReflectColimit {F : J ⥤ Arrow C} {c : Cocone F}
     ext
     · exact hc₁.hom_ext (fun j ↦ Eq.symm ((hc₁.fac ..).trans (by simp [← hm])))
     · exact hc₂.hom_ext (fun j ↦ Eq.symm ((hc₂.fac ..).trans (by simp [← hm])))
+
+def isInitial {f : Arrow C} (h₁ : IsInitial f.left) (h₂ : IsInitial f.right) :
+    IsInitial f :=
+  leftRightJointlyReflectColimit
+    ((isColimitMapCoconeEmptyCoconeEquiv _ _).symm h₁)
+    ((isColimitMapCoconeEmptyCoconeEquiv _ _).symm h₂)
 
 end CategoryTheory.Arrow

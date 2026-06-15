@@ -207,6 +207,14 @@ lemma WeightedCocone.IsColimit.ι_iso_hom
   IsColimit.comp_coconePointUniqueUpToIso_hom (colimit.isColimit _) hc
     (op (Functor.elementsMk _ _ x))
 
+@[reassoc (attr := simp)]
+lemma WeightedCocone.IsColimit.ι_iso_inv
+    {W : Jᵒᵖ ⥤ Type w} {F : J ⥤ C} {c : WeightedCocone W F}
+    (hc : c.IsColimit) {j : J} (x : W.obj (op j)) :
+    c.ι x ≫ hc.iso.inv = weightedColimObjObjι W F x :=
+  IsColimit.comp_coconePointUniqueUpToIso_inv (colimit.isColimit _) hc
+    (op (Functor.elementsMk _ _ x))
+
 instance (W : Jᵒᵖ ⥤ Type w) {K : Type*} [Category* K] [HasColimitsOfShape K C] :
     PreservesColimitsOfShape K (weightedColim.obj W : (J ⥤ C) ⥤ C) where
   preservesColimit {G} := by dsimp [weightedColim]; infer_instance

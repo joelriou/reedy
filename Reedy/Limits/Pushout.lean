@@ -18,6 +18,8 @@ namespace CategoryTheory
 
 open Limits
 
+section
+
 variable {C : Type*} [Category* C] {X₀ : C}
 
 variable (X₀) in
@@ -130,5 +132,20 @@ instance : (pushoutFunctor (X₀ := X₀)).IsLeftAdjoint :=
   pushoutFunctorAdj.isLeftAdjoint
 
 end ArrowLeftOver
+
+end
+
+namespace Limits
+
+variable {C : Type*} [Category* C] {X Y Z : C} (f : X ⟶ Y) (g : X ⟶ Z)
+  [HasPushout f g]
+
+noncomputable abbrev pushout.inlIso' (h : IsIso g) :
+  Y ≅ pushout f g := asIso (pushout.inl f g)
+
+noncomputable abbrev pushout.inrIso' (h : IsIso f) :
+  Z ≅ pushout f g := asIso (pushout.inr f g)
+
+end Limits
 
 end CategoryTheory

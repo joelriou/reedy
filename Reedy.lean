@@ -6,6 +6,7 @@ import Reedy.Arrow.Over
 import Reedy.KanExtension.FullyFaithful
 import Reedy.Limits.Colim
 import Reedy.Limits.FunctorCategoryMono
+import Reedy.Limits.Initial
 import Reedy.Limits.Lim
 import Reedy.Limits.Op
 import Reedy.Limits.Over
