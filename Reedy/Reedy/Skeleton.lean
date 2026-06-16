@@ -5,6 +5,7 @@ Authors: Joël Riou
 -/
 module
 
+public import Mathlib.CategoryTheory.Limits.Shapes.Pullback.PullbackObjObj
 public import Mathlib.CategoryTheory.Limits.Shapes.Countable
 public import Reedy.Limits.Initial
 public import Reedy.Limits.PreservesWellOrderContinuous
@@ -171,9 +172,12 @@ noncomputable def relativeCellComplexSk :
       simp only [Category.id_comp, Category.comp_id]
       exact ((weightedColimObjYonedaObjIso D X).inv.naturality f.hom).symm)
 
--- TODO: "compute" `basicCellRelativeSk`
--- the cells `basicCellRelativeSk` are pushouts of more basic
--- morphisms
+lemma exists_isPushout (a : α) (c : r.Cell a) {F G : C ⥤ D} (f : F ⟶ G) :
+    ∃ t b, IsPushout t
+      ((weightedColim₂.{u}.leibnizPushout.obj
+        (Arrow.mk (r.externalUnionProd c.val).ι)).obj (Arrow.mk f)).hom
+      ((r.basicCellRelativeSk a c).app (Arrow.mk f)) b := by
+  sorry
 
 end ReedyStructure
 
