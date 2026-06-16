@@ -5,6 +5,9 @@ Authors: Joël Riou
 -/
 module
 
+
+public import Mathlib.Data.Fintype.Basic
+public import Mathlib.Tactic.FinCases
 public import Mathlib.CategoryTheory.Limits.Shapes.Multiequalizer
 
 /-!
@@ -61,6 +64,43 @@ def pushout₃ : MultispanIndex .pushout₃ C where
     | 1 => g₁
     | 2 => g₂
 
+section
+
+variable {f₀ g₀ f₁ g₁ f₂ g₂}
+variable {zero₂ one₂ two₂ zero'₂ one'₂ two'₂ : C}
+  {f₀' : zero'₂ ⟶ one₂} {g₀' : zero'₂ ⟶ two₂}
+  {f₁' : one'₂ ⟶ zero₂} {g₁' : one'₂ ⟶ two₂}
+  {f₂' : two'₂ ⟶ zero₂} {g₂' : two'₂ ⟶ one₂}
+  (e₀ : zero ≅ zero₂)
+  (e₁ : one ≅ one₂)
+  (e₂ : two ≅ two₂)
+  (e₀' : zero' ≅ zero'₂)
+  (e₁' : one' ≅ one'₂)
+  (e₂' : two' ≅ two'₂)
+
+set_option backward.defeqAttrib.useBackward true in
+abbrev pushout₃MultispanExt
+    (w₀ : f₀ ≫ e₁.hom = e₀'.hom ≫ f₀' := by cat_disch)
+    (w₁ : f₁ ≫ e₀.hom = e₁'.hom ≫ f₁' := by cat_disch)
+    (w₂ : f₂ ≫ e₀.hom = e₂'.hom ≫ f₂' := by cat_disch)
+    (w₀' : g₀ ≫ e₂.hom = e₀'.hom ≫ g₀' := by cat_disch)
+    (w₁' : g₁ ≫ e₂.hom = e₁'.hom ≫ g₁' := by cat_disch)
+    (w₂' : g₂ ≫ e₁.hom = e₂'.hom ≫ g₂' := by cat_disch) :
+    (pushout₃ f₀ g₀ f₁ g₁ f₂ g₂).multispan ≅ (pushout₃ f₀' g₀' f₁' g₁' f₂' g₂').multispan :=
+  WalkingMultispan.functorExt
+    (fun (i : Fin 3) ↦ match i with
+      | 0 => e₀'
+      | 1 => e₁'
+      | 2 => e₂')
+    (fun (i : Fin 3) ↦ match i with
+      | 0 => e₀
+      | 1 => e₁
+      | 2 => e₂)
+    (fun (i : Fin 3) ↦ by fin_cases i <;> assumption)
+    (fun (i : Fin 3) ↦ by fin_cases i <;> assumption)
+
+end
+
 end MultispanIndex
 
 section
@@ -77,7 +117,7 @@ namespace PushoutCocone₃
 
 section
 
-variable (c : PushoutCocone₃ f₀ g₀ f₁ g₁ f₂ g₂)
+variable (c c' : PushoutCocone₃ f₀ g₀ f₁ g₁ f₂ g₂)
 
 abbrev ι₀ : zero ⟶ c.pt := Multicofork.π c (0 : Fin 3)
 abbrev ι₁ : one ⟶ c.pt := Multicofork.π c (1 : Fin 3)
@@ -86,6 +126,13 @@ abbrev ι₂ : two ⟶ c.pt := Multicofork.π c (2 : Fin 3)
 @[reassoc] lemma w₀ : f₀ ≫ c.ι₁ = g₀ ≫ c.ι₂ := Multicofork.condition c (0 : Fin 3)
 @[reassoc] lemma w₁ : f₁ ≫ c.ι₀ = g₁ ≫ c.ι₂ := Multicofork.condition c (1 : Fin 3)
 @[reassoc] lemma w₂ : f₂ ≫ c.ι₀ = g₂ ≫ c.ι₁ := Multicofork.condition c (2 : Fin 3)
+
+variable {c c'} in
+abbrev ext (e : c.pt ≅ c'.pt)
+    (h₀ : c.ι₀ ≫ e.hom = c'.ι₀ := by cat_disch)
+    (h₁ : c.ι₁ ≫ e.hom = c'.ι₁ := by cat_disch)
+    (h₂ : c.ι₂ ≫ e.hom = c'.ι₂ := by cat_disch) : c ≅ c' :=
+  Multicofork.ext e (fun (i : Fin 3) ↦ by fin_cases i <;> assumption)
 
 end
 

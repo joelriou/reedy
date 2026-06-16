@@ -61,6 +61,101 @@ lemma ι₂_ι : sq₃.ι₂ ≫ sq₃.ι = ((F.obj Y₁).map f₂).app Y₃ := 
 @[reassoc (attr := simp)]
 lemma ι₃_ι : sq₃.ι₃ ≫ sq₃.ι = ((F.obj Y₁).obj Y₂).map f₃ := by simp [ι]
 
+section
+
+variable (sq₃' : PushoutObjObjObj F f₁ f₂ f₃)
+
+noncomputable def ptUniqueUpToIso : sq₃.pt ≅ sq₃'.pt :=
+  IsColimit.coconePointUniqueUpToIso sq₃.isPushout₃.isColimit sq₃'.isPushout₃.isColimit
+
+@[reassoc (attr := simp)]
+lemma ι₁_ptUniqueUpToIso_hom : sq₃.ι₁ ≫ (ptUniqueUpToIso sq₃ sq₃').hom = sq₃'.ι₁ :=
+  IsColimit.comp_coconePointUniqueUpToIso_hom sq₃.isPushout₃.isColimit
+    sq₃'.isPushout₃.isColimit (.right (0 : Fin 3))
+
+@[reassoc (attr := simp)]
+lemma ι₂_ptUniqueUpToIso_hom : sq₃.ι₂ ≫ (ptUniqueUpToIso sq₃ sq₃').hom = sq₃'.ι₂ :=
+  IsColimit.comp_coconePointUniqueUpToIso_hom sq₃.isPushout₃.isColimit
+    sq₃'.isPushout₃.isColimit (.right (1 : Fin 3))
+
+@[reassoc (attr := simp)]
+lemma ι₃_ptUniqueUpToIso_hom : sq₃.ι₃ ≫ (ptUniqueUpToIso sq₃ sq₃').hom = sq₃'.ι₃ :=
+  IsColimit.comp_coconePointUniqueUpToIso_hom sq₃.isPushout₃.isColimit
+    sq₃'.isPushout₃.isColimit (.right (2 : Fin 3))
+
+@[reassoc (attr := simp)]
+lemma ι₁_ptUniqueUpToIso_inv : sq₃'.ι₁ ≫ (ptUniqueUpToIso sq₃ sq₃').inv = sq₃.ι₁ :=
+  IsColimit.comp_coconePointUniqueUpToIso_inv sq₃.isPushout₃.isColimit
+    sq₃'.isPushout₃.isColimit (.right (0 : Fin 3))
+
+@[reassoc (attr := simp)]
+lemma ι₂_ptUniqueUpToIso_inv : sq₃'.ι₂ ≫ (ptUniqueUpToIso sq₃ sq₃').inv = sq₃.ι₂ :=
+  IsColimit.comp_coconePointUniqueUpToIso_inv sq₃.isPushout₃.isColimit
+    sq₃'.isPushout₃.isColimit (.right (1 : Fin 3))
+
+@[reassoc (attr := simp)]
+lemma ι₃_ptUniqueUpToIso_inv : sq₃'.ι₃ ≫ (ptUniqueUpToIso sq₃ sq₃').inv = sq₃.ι₃ :=
+  IsColimit.comp_coconePointUniqueUpToIso_inv sq₃.isPushout₃.isColimit
+    sq₃'.isPushout₃.isColimit (.right (2 : Fin 3))
+
+@[reassoc (attr := simp)]
+lemma ptUniqueUpToIso_hom_ι : (sq₃.ptUniqueUpToIso sq₃').hom ≫ sq₃'.ι = sq₃.ι := by
+  apply sq₃.isPushout₃.hom_ext <;> simp
+
+@[reassoc (attr := simp)]
+lemma ptUniqueUpToIso_inv_ι : (sq₃.ptUniqueUpToIso sq₃').inv ≫ sq₃.ι = sq₃'.ι := by
+  apply sq₃'.isPushout₃.hom_ext <;> simp
+
+set_option backward.defeqAttrib.useBackward true in
+noncomputable abbrev arrowUnique : Arrow.mk sq₃.ι ≅ Arrow.mk sq₃'.ι :=
+  Arrow.isoMk (sq₃.ptUniqueUpToIso sq₃') (Iso.refl _)
+
+end
+
+section
+
+variable {F' : C₁ ⥤ C₂ ⥤ C₃ ⥤ D} (e : F ≅ F')
+
+set_option backward.defeqAttrib.useBackward true in
+attribute [local simp] Multicofork.π in
+/-- Transport a `Functor.PushoutObjObjObjObj` structure via a natural isomorphism of functors. -/
+@[simps]
+def ofNatIso : F'.PushoutObjObjObj f₁ f₂ f₃ where
+  pt := sq₃.pt
+  ι₁ := ((e.inv.app X₁).app Y₂).app Y₃ ≫ sq₃.ι₁
+  ι₂ := ((e.inv.app Y₁).app X₂).app Y₃ ≫ sq₃.ι₂
+  ι₃ := ((e.inv.app Y₁).app Y₂).app X₃ ≫ sq₃.ι₃
+  isPushout₃.w₀ := by simp [sq₃.isPushout₃.w₀]
+  isPushout₃.w₁ := by
+    simp [sq₃.isPushout₃.w₁,
+      reassoc_of% dsimp% NatTrans.congr_app (NatTrans.congr_app (e.inv.naturality f₁) Y₂) X₃]
+  isPushout₃.w₂ := by
+    simp [sq₃.isPushout₃.w₂,
+      reassoc_of% dsimp% NatTrans.congr_app (NatTrans.congr_app (e.inv.naturality f₁) X₂) Y₃]
+  isPushout₃.nonempty_isColimit :=
+    ⟨IsColimit.equivOfNatIsoOfIso
+      (MultispanIndex.pushout₃MultispanExt
+      (((e.app _).app _).app _) (((e.app _).app _).app _) (((e.app _).app _).app _)
+      (((e.app _).app _).app _) (((e.app _).app _).app _) (((e.app _).app _).app _)
+      (by simp) (by simp) (by simp) (by simp)
+      (NatTrans.congr_app (NatTrans.congr_app (e.hom.naturality f₁) _) _)
+      (NatTrans.congr_app (NatTrans.congr_app (e.hom.naturality f₁) _) _)) _ _
+        (by exact PushoutCocone₃.ext (Iso.refl _)) sq₃.isPushout₃.isColimit⟩
+
+set_option backward.defeqAttrib.useBackward true in
+@[simp, reassoc]
+lemma ofNatIso_ι :
+    (sq₃.ofNatIso e).ι = sq₃.ι ≫ ((e.hom.app _).app _).app _ := by
+  apply (sq₃.ofNatIso e).isPushout₃.hom_ext
+  · rw [(sq₃.ofNatIso e).ι₁_ι]
+    simp [← NatTrans.comp_app]
+  · rw [(sq₃.ofNatIso e).ι₂_ι]
+    simp
+  · rw [(sq₃.ofNatIso e).ι₃_ι]
+    simp
+
+end
+
 end PushoutObjObjObj
 
 end
