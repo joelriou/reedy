@@ -14,13 +14,11 @@ public import Mathlib.AlgebraicTopology.SimplicialObject.Basic
 
 -/
 
-open HomotopicalAlgebra
-
 @[expose] public section
 
-namespace CategoryTheory
+namespace HomotopicalAlgebra
 
-open Limits
+open CategoryTheory Limits
 
 variable {C : Type*} [Category* C] [ModelCategory C]
   [HasColimitsOfSize.{0, 0} C] [HasLimitsOfSize.{0, 0} C]
@@ -31,4 +29,4 @@ example : ModelCategory (CosimplicialObject C) :=
 example : ModelCategory (SimplicialObject C) :=
   inferInstanceAs (ModelCategory (SimplexCategory.reedyStructure.op.FunctorCategory C))
 
-end CategoryTheory
+end HomotopicalAlgebra

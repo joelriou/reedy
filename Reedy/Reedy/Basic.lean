@@ -19,7 +19,9 @@ public import Mathlib.Order.SuccPred.Basic
 
 universe u
 
-namespace CategoryTheory
+open CategoryTheory
+
+namespace HomotopicalAlgebra
 
 -- C.4.1
 open MorphismProperty in
@@ -179,4 +181,4 @@ lemma degHom_lt_or_of_degHom_comp_lt
 
 end ReedyStructure
 
-end CategoryTheory
+end HomotopicalAlgebra

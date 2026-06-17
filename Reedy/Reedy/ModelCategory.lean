@@ -19,9 +19,9 @@ public import Mathlib.CategoryTheory.Limits.FunctorCategory.Finite
 
 universe w u
 
-namespace CategoryTheory
+namespace HomotopicalAlgebra
 
-open HomotopicalAlgebra Limits
+open CategoryTheory Limits
 
 variable {C : Type u} [SmallCategory C] {W₁ W₂ : MorphismProperty C}
   [W₁.IsMultiplicative] [W₂.IsMultiplicative]
@@ -98,4 +98,4 @@ end FunctorCategory
 
 end ReedyStructure
 
-end CategoryTheory
+end HomotopicalAlgebra

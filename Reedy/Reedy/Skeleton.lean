@@ -27,7 +27,7 @@ universe u u' vD uD v'' u''
 
 namespace CategoryTheory
 
-open HomotopicalAlgebra Opposite Limits FunctorToTypes
+open Limits
 
 namespace Over
 
@@ -76,6 +76,12 @@ noncomputable abbrev toUnderArrowLeftFunc : Over Ψ ⥤ Under (Arrow.leftFunc �
   toArrowLeftOver Ψ ⋙ ArrowLeftOver.pushoutFunctor
 
 end Over
+
+end CategoryTheory
+
+namespace HomotopicalAlgebra
+
+open CategoryTheory Limits Opposite FunctorToTypes
 
 variable {C : Type u} [SmallCategory C] {W₁ W₂ : MorphismProperty C}
   [W₁.IsMultiplicative] [W₂.IsMultiplicative]
@@ -150,7 +156,7 @@ noncomputable def relativeCellComplexSk :
         Functor.isoWhiskerRight ((Functor.mapArrowFunctor _ _).mapIso
           (weightedColim₂ObjYonedaIso C D).symm) _ ≪≫ pushout.inlIso' _ _ (by
         dsimp
-        simp only [Functor.map_id, Functor.whiskerLeft_id', Category.id_comp]
+        simp only [CategoryTheory.Functor.map_id, Functor.whiskerLeft_id', Category.id_comp]
         infer_instance)
     · dsimp [ArrowLeftOver.mk, ArrowLeftOver.top]
       simp only [Category.assoc, colimit.ι_desc, PushoutCocone.mk_pt, PushoutCocone.mk_ι_app,
@@ -161,7 +167,7 @@ noncomputable def relativeCellComplexSk :
         Arrow.leftFunc.rightUnitor.inv ≫ Arrow.leftFunc.whiskerLeft
           (weightedColim₂ObjYonedaIso C D).inv ≫ b := by
         dsimp [b]
-        rw [Functor.map_id, Functor.whiskerLeft_id', Category.id_comp,
+        rw [CategoryTheory.Functor.map_id, Functor.whiskerLeft_id', Category.id_comp,
           ← Functor.whiskerLeft_comp]
         simp
       rw [this, Category.assoc, Category.assoc, ← pushout.condition]
@@ -181,4 +187,4 @@ lemma exists_isPushout (a : α) (c : r.Cell a) {F G : C ⥤ D} (f : F ⟶ G) :
 
 end ReedyStructure
 
-end CategoryTheory
+end HomotopicalAlgebra

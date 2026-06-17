@@ -32,9 +32,9 @@ universe w u
 
 @[expose] public section
 
-namespace CategoryTheory
+namespace HomotopicalAlgebra
 
-open HomotopicalAlgebra Limits
+open CategoryTheory Limits
 
 variable {C : Type u} [SmallCategory C] {W₁ W₂ : MorphismProperty C}
   [W₁.IsMultiplicative] [W₂.IsMultiplicative]
@@ -94,4 +94,4 @@ instance isWeakFactorizationSystem [IsWeakFactorizationSystem P₁ P₂] :
 
 end ReedyStructure
 
-end CategoryTheory
+end HomotopicalAlgebra

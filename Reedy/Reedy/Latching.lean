@@ -18,9 +18,9 @@ universe u
 
 @[expose] public section
 
-namespace CategoryTheory
+namespace HomotopicalAlgebra
 
-open HomotopicalAlgebra Opposite Limits FunctorToTypes
+open CategoryTheory Opposite Limits FunctorToTypes
 
 variable {C : Type u} [SmallCategory C] {W₁ W₂ : MorphismProperty C}
   [W₁.IsMultiplicative] [W₂.IsMultiplicative]
@@ -99,4 +99,4 @@ noncomputable def relativeLatchingFunctor (X : C) : Arrow (C ⥤ D) ⥤ Arrow D 
 
 end ReedyStructure
 
-end CategoryTheory
+end HomotopicalAlgebra

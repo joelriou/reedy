@@ -16,7 +16,7 @@ public import Mathlib.Data.Nat.SuccPred
 
 @[expose] public section
 
-open CategoryTheory MorphismProperty
+open CategoryTheory MorphismProperty HomotopicalAlgebra
 
 namespace SimplexCategory
 
