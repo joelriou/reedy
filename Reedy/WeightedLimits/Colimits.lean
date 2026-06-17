@@ -42,11 +42,19 @@ protected abbrev ι (c : WeightedCocone W F) {j : J} (x : W.obj (op j)) :
     F.obj j ⟶ c.pt :=
   (Cocone.ι c).app (op (Functor.elementsMk _ _ x))
 
+@[reassoc (attr := simp)]
+lemma w (c : WeightedCocone W F) {j : J} (x : W.obj (op j)) {j' : J} (f : j' ⟶ j) :
+    F.map f ≫ c.ι x = c.ι (W.map f.op x) := by
+  let φ : Functor.elementsMk _ _ x ⟶ Functor.elementsMk _ _ (W.map f.op x) := ⟨f.op, rfl⟩
+  exact Cocone.w c φ.op
+
+section
+
 variable (pt : C) (ι : ∀ ⦃j : J⦄ (_ : W.obj (op j)), F.obj j ⟶ pt)
   (hι : ∀ ⦃j₁ j₂ : J⦄ (x : W.obj (op j₁)) (f : j₂ ⟶ j₁),
     F.map f ≫ ι x = ι (W.map f.op x))
-set_option backward.defeqAttrib.useBackward true in
 
+set_option backward.defeqAttrib.useBackward true in
 @[simps pt]
 def mk : WeightedCocone W F where
   pt := pt
@@ -56,6 +64,17 @@ def mk : WeightedCocone W F where
 @[simp]
 lemma mk_ι {j : J} (x : W.obj (op j)) :
     (mk pt ι hι).ι x = ι x := rfl
+
+end
+
+set_option backward.isDefEq.respectTransparency false in
+@[simps!]
+noncomputable def sigma
+    (c : WeightedCocone W F) (T : Type w) [HasCoproduct (fun (_ : T) ↦ c.pt)] :
+    WeightedCocone (((Functor.const Jᵒᵖ).obj T).prod' W ⋙ Functor.uncurry.obj TypeCat.prod) F :=
+  mk (∐ fun (_ : T) ↦ c.pt)
+    (fun j (t, w) ↦ c.ι w ≫ Sigma.ι (fun (_ : T) ↦ c.pt) t)
+    (by cat_disch)
 
 protected abbrev IsColimit (c : WeightedCocone W F) := Limits.IsColimit c
 
@@ -84,6 +103,18 @@ include hc in
 lemma hom_ext {f g : c.pt ⟶ Z} (h : ∀ {j : J} (x : W.obj (op j)), c.ι x ≫ f = c.ι x ≫ g) :
     f = g :=
   Limits.IsColimit.hom_ext hc (fun _ ↦ h _)
+
+set_option backward.defeqAttrib.useBackward true in
+attribute [local simp] Sigma.ι_desc in
+noncomputable abbrev sigma
+    {c : WeightedCocone W F} (hc : c.IsColimit) (T : Type w) [HasCoproduct (fun (_ : T) ↦ c.pt)] :
+    (c.sigma T).IsColimit where
+  desc (s : WeightedCocone _ _) :=
+    Sigma.desc (fun t ↦ hc.desc (fun j w ↦ s.ι (t, w)) (by cat_disch))
+  uniq (s : WeightedCocone _ _) m hm := by
+    dsimp
+    ext t
+    exact hc.hom_ext (fun {j} w ↦ by simpa using! hm ⟨⟨⟨j⟩, (t, w)⟩⟩)
 
 end IsColimit
 
@@ -291,12 +322,15 @@ end
 
 section
 
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 noncomputable def weightedColim.bifunctorComp₁₂Iso [HasCoproducts.{w} C] :
     bifunctorComp₁₂
       (Functor.const Jᵒᵖ ⋙ (Functor.whiskeringRight₂ Jᵒᵖ _ _ _).obj TypeCat.prod.{w, w})
       (weightedColim.{w} (C := C)) ≅
-    bifunctorComp₂₃ (sigmaConst.{w} (C := C)).flip weightedColim.{w} := by
-  sorry
+    bifunctorComp₂₃ sigmaConst.{w}.flip weightedColim.{w} :=
+  NatIso.ofComponents (fun T ↦ NatIso.ofComponents
+    (fun W ↦ NatIso.ofComponents (fun F ↦ ((isColimitWeightedColimCocone W F).sigma T).iso)))
 
 end
 
