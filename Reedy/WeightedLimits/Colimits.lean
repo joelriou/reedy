@@ -5,9 +5,11 @@ Authors: Joël Riou, Nima Rasekh, Lyne Moser
 -/
 module
 
+public import Mathlib.CategoryTheory.Functor.Trifunctor
 public import Mathlib.CategoryTheory.Limits.Preserves.FunctorCategory
 public import Mathlib.CategoryTheory.Limits.Preserves.Opposites
 public import Reedy.Adjunction.ParametrizedColimits
+public import Reedy.Subfunctor.ExternalUnionProd
 public import Reedy.Limits.Colim
 public import Reedy.Limits.PiConst
 public import Reedy.Limits.Op
@@ -289,6 +291,17 @@ end
 
 section
 
+noncomputable def bifunctorComp₁₂ProdWeightedColimIso [HasCoproducts.{w} C] :
+    bifunctorComp₁₂
+      (Functor.const Jᵒᵖ ⋙ (Functor.whiskeringRight₂ Jᵒᵖ _ _ _).obj TypeCat.prod.{w, w})
+      (weightedColim.{w} (C := C)) ≅
+    bifunctorComp₂₃ (sigmaConst.{w} (C := C)).flip weightedColim.{w} := by
+  sorry
+
+end
+
+section
+
 variable {J' : Type*} [Category* J']
 
 -- A.6 (iv)
@@ -320,6 +333,36 @@ instance {K : Type*} [Category* K] [HasProducts.{w} C] [HasColimitsOfShape K (Ty
 
 instance [HasProducts.{w} C] [HasColimitsOfSize.{v'', u''} (Type w)] :
     PreservesColimitsOfSize.{v'', u''} (weightedColim₂ (J' := J') (J := J) (C := C)) where
+
+variable [HasCoproducts.{w} C]
+
+set_option backward.defeqAttrib.useBackward true in
+noncomputable def bifunctorComp₁₂ExternalProductFunctorWeightedColim₂Iso :
+    bifunctorComp₁₂
+      FunctorToTypes.externalProductFunctor.{w, w}
+        (weightedColim₂.{w} (J := J) (J' := J') (C := C)) ≅
+    bifunctorComp₂₃
+      (sigmaConst.{w} ⋙ Functor.whiskeringRight J' (Type w) C).flip weightedColim.{w} :=
+  NatIso.ofComponents
+    (fun W₁ ↦ NatIso.ofComponents
+      (fun W₂ ↦ NatIso.ofComponents
+        (fun F ↦ NatIso.ofComponents
+          (fun j' ↦ ((bifunctorComp₁₂ProdWeightedColimIso.app (W₁.obj j')).app W₂).app F)
+          (fun {j₁' j₂'} f ↦
+            NatTrans.congr_app (NatTrans.congr_app
+                ((bifunctorComp₁₂ProdWeightedColimIso.hom.naturality (W₁.map f))) W₂) F))
+        (fun {F₁ F₂} f ↦ by
+          ext j'
+          exact ((bifunctorComp₁₂ProdWeightedColimIso.hom.app
+            (W₁.obj j')).app W₂).naturality f))
+      (fun {W₂ W₂'} f ↦ by
+        ext F j'
+        exact NatTrans.congr_app
+          ((bifunctorComp₁₂ProdWeightedColimIso.hom.app (W₁.obj j')).naturality f) F))
+    (fun {W₁ W₁'} f ↦ by
+      ext W₂ F j'
+      exact NatTrans.congr_app (NatTrans.congr_app
+        (bifunctorComp₁₂ProdWeightedColimIso.hom.naturality (f.app j')) W₂) F)
 
 end
 
