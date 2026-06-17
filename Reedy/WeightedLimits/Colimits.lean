@@ -291,7 +291,7 @@ end
 
 section
 
-noncomputable def bifunctorComp₁₂ProdWeightedColimIso [HasCoproducts.{w} C] :
+noncomputable def weightedColim.bifunctorComp₁₂Iso [HasCoproducts.{w} C] :
     bifunctorComp₁₂
       (Functor.const Jᵒᵖ ⋙ (Functor.whiskeringRight₂ Jᵒᵖ _ _ _).obj TypeCat.prod.{w, w})
       (weightedColim.{w} (C := C)) ≅
@@ -337,7 +337,7 @@ instance [HasProducts.{w} C] [HasColimitsOfSize.{v'', u''} (Type w)] :
 variable [HasCoproducts.{w} C]
 
 set_option backward.defeqAttrib.useBackward true in
-noncomputable def bifunctorComp₁₂ExternalProductFunctorWeightedColim₂Iso :
+noncomputable def weightedColim₂.bifunctorComp₁₂Iso :
     bifunctorComp₁₂
       FunctorToTypes.externalProductFunctor.{w, w}
         (weightedColim₂.{w} (J := J) (J' := J') (C := C)) ≅
@@ -347,22 +347,22 @@ noncomputable def bifunctorComp₁₂ExternalProductFunctorWeightedColim₂Iso :
     (fun W₁ ↦ NatIso.ofComponents
       (fun W₂ ↦ NatIso.ofComponents
         (fun F ↦ NatIso.ofComponents
-          (fun j' ↦ ((bifunctorComp₁₂ProdWeightedColimIso.app (W₁.obj j')).app W₂).app F)
+          (fun j' ↦ ((weightedColim.bifunctorComp₁₂Iso.app (W₁.obj j')).app W₂).app F)
           (fun {j₁' j₂'} f ↦
             NatTrans.congr_app (NatTrans.congr_app
-                ((bifunctorComp₁₂ProdWeightedColimIso.hom.naturality (W₁.map f))) W₂) F))
+                ((weightedColim.bifunctorComp₁₂Iso.hom.naturality (W₁.map f))) W₂) F))
         (fun {F₁ F₂} f ↦ by
           ext j'
-          exact ((bifunctorComp₁₂ProdWeightedColimIso.hom.app
+          exact ((weightedColim.bifunctorComp₁₂Iso.hom.app
             (W₁.obj j')).app W₂).naturality f))
       (fun {W₂ W₂'} f ↦ by
         ext F j'
         exact NatTrans.congr_app
-          ((bifunctorComp₁₂ProdWeightedColimIso.hom.app (W₁.obj j')).naturality f) F))
+          ((weightedColim.bifunctorComp₁₂Iso.hom.app (W₁.obj j')).naturality f) F))
     (fun {W₁ W₁'} f ↦ by
       ext W₂ F j'
       exact NatTrans.congr_app (NatTrans.congr_app
-        (bifunctorComp₁₂ProdWeightedColimIso.hom.naturality (f.app j')) W₂) F)
+        (weightedColim.bifunctorComp₁₂Iso.hom.naturality (f.app j')) W₂) F)
 
 end
 
