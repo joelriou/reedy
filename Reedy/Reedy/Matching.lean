@@ -28,7 +28,7 @@ variable {C : Type u} [SmallCategory C] {W₁ W₂ : MorphismProperty C}
 
 namespace ReedyStructure
 
-variable (r : ReedyStructure W₁ W₂ α) {D : Type*} [Category D]
+variable (r : ReedyStructure W₁ W₂ α) {D : Type*} [Category* D]
   [HasLimitsOfSize.{u, u} D]
 
 variable (X : C)

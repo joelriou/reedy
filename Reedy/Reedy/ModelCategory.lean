@@ -31,10 +31,10 @@ namespace ReedyStructure
 
 open MorphismProperty
 
-def FunctorCategory (_ : ReedyStructure W₁ W₂ α) (D : Type*) [Category D] := C ⥤ D
+def FunctorCategory (_ : ReedyStructure W₁ W₂ α) (D : Type*) [Category* D] := C ⥤ D
 deriving Category
 
-variable (r : ReedyStructure W₁ W₂ α) {D : Type*} [Category D]
+variable (r : ReedyStructure W₁ W₂ α) {D : Type*} [Category* D]
   (P₁ : MorphismProperty D) (P₂ : MorphismProperty D)
   [IsWeakFactorizationSystem P₁ P₂]
   [ModelCategory D]

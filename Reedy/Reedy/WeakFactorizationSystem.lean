@@ -44,7 +44,7 @@ namespace ReedyStructure
 
 open MorphismProperty
 
-variable (r : ReedyStructure W₁ W₂ α) {D : Type*} [Category D]
+variable (r : ReedyStructure W₁ W₂ α) {D : Type*} [Category* D]
   [HasColimitsOfSize.{u, u} D] [HasLimitsOfSize.{u, u} D]
   (P₁ : MorphismProperty D) (P₂ : MorphismProperty D)
 

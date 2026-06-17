@@ -34,5 +34,6 @@ import Reedy.RelativeCellComplex.Under
 import Reedy.Subfunctor.Colimits
 import Reedy.Subfunctor.ExternalUnionProd
 import Reedy.Subfunctor.SubfunctorTwo
+import Reedy.Test
 import Reedy.WeightedLimits.Colimits
 import Reedy.WeightedLimits.Limits
