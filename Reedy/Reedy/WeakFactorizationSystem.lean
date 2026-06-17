@@ -45,14 +45,28 @@ namespace ReedyStructure
 open MorphismProperty
 
 variable (r : ReedyStructure W₁ W₂ α) {D : Type*} [Category* D]
-  [HasColimitsOfSize.{u, u} D] [HasLimitsOfSize.{u, u} D]
   (P₁ : MorphismProperty D) (P₂ : MorphismProperty D)
 
-def left : MorphismProperty (C ⥤ D) :=
+
+def left [HasColimitsOfSize.{u, u} D] : MorphismProperty (C ⥤ D) :=
   ⨅ (X : C), .ofArrowObj (P₁.arrowObj.inverseImage (r.relativeLatchingFunctor X))
 
-def right : MorphismProperty (C ⥤ D) :=
+variable {r P₁} in
+lemma left.apply [HasColimitsOfSize.{u, u} D] {F G : C ⥤ D} {f : F ⟶ G} (h : r.left P₁ f) (X : C) :
+    P₁ ((r.relativeLatchingFunctor X).obj (Arrow.mk f)).hom := by
+  simp only [left, iInf_iff] at h
+  exact h _
+
+def right [HasLimitsOfSize.{u, u} D] : MorphismProperty (C ⥤ D) :=
   ⨅ (X : C), .ofArrowObj (P₂.arrowObj.inverseImage (r.relativeMatchingFunctor X))
+
+variable {r P₂} in
+lemma right.apply [HasLimitsOfSize.{u, u} D] {F G : C ⥤ D} {f : F ⟶ G} (h : r.right P₂ f) (X : C) :
+    P₂ ((r.relativeMatchingFunctor X).obj (Arrow.mk f)).hom := by
+  simp only [right, iInf_iff] at h
+  exact h _
+
+variable [HasColimitsOfSize.{u, u} D] [HasLimitsOfSize.{u, u} D]
 
 instance [P₁.IsStableUnderRetracts] : (r.left P₁).IsStableUnderRetracts := by
   dsimp [left]
@@ -83,6 +97,8 @@ lemma hasLiftingProperty [IsWeakFactorizationSystem P₁ P₂]
   · intro c
     obtain ⟨t, b, sq⟩ := r.exists_isPushout c.j c.i i
     refine MorphismProperty.of_isPushout sq ?_
+    replace hi := hi.apply c.i
+    replace hp := hp.apply c.i
     sorry
 
 -- C.5.5
