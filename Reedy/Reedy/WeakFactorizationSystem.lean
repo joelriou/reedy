@@ -6,11 +6,13 @@ Authors: Joël Riou
 module
 
 public import Mathlib.CategoryTheory.MorphismProperty.WeakFactorizationSystem
+public import Mathlib.CategoryTheory.SmallObject.TransfiniteCompositionLifting
 public import Reedy.Arrow.ObjectProperty
 public import Reedy.MorphismProperty.Retracts
 public import Reedy.ObjectProperty.Retracts
 public import Reedy.Reedy.Latching
 public import Reedy.Reedy.Matching
+public import Reedy.Reedy.Skeleton
 
 /-!
 # Weak factorization systems on the category of functors
@@ -26,7 +28,7 @@ and `(trivialCofibrations D, fibrations D)`.
 
 -/
 
-universe u
+universe w u
 
 @[expose] public section
 
@@ -36,7 +38,7 @@ open HomotopicalAlgebra Limits
 
 variable {C : Type u} [SmallCategory C] {W₁ W₂ : MorphismProperty C}
   [W₁.IsMultiplicative] [W₂.IsMultiplicative]
-  {α : Type*} [LinearOrder α] [OrderBot α] [SuccOrder α] [WellFoundedLT α]
+  {α : Type w} [LinearOrder α] [OrderBot α] [SuccOrder α] [WellFoundedLT α]
 
 namespace ReedyStructure
 
@@ -63,11 +65,25 @@ instance [P₂.IsStableUnderRetracts] : (r.right P₂).IsStableUnderRetracts := 
 -- C.5.7
 instance [P₁.HasFactorization P₂] : (r.left P₁).HasFactorization (r.right P₂) := sorry
 
+variable [HasColimitsOfSize.{w, w} (Type u)] [NoMaxOrder α]
+  [HasColimitsOfShape α D] [HasIterationOfShape α D]
+
 -- C.5.6
 lemma hasLiftingProperty [IsWeakFactorizationSystem P₁ P₂]
     {A B X Y : C ⥤ D} (i : A ⟶ B) (p : X ⟶ Y) (hi : r.left P₁ i) (hp : r.right P₂ p) :
     HasLiftingProperty i p := by
-  sorry
+  suffices llp (.single p) i from this _ (prop_single p)
+  refine (?_ : (_ : MorphismProperty _) ≤ _) _
+    ((r.relativeCellComplexSk.map ((evaluation _ _).obj
+    (Arrow.mk i))).transfiniteCompositionOfShape'
+    (I := (MorphismProperty.single p).llp) ?_).mem
+  · simp only [coproducts_eq_self]
+    exact le_trans (transfiniteCompositionsOfShape_monotone _ (by simp))
+      (transfiniteCompositionsOfShape_le _ _)
+  · intro c
+    obtain ⟨t, b, sq⟩ := r.exists_isPushout c.j c.i i
+    refine MorphismProperty.of_isPushout sq ?_
+    sorry
 
 -- C.5.5
 instance isWeakFactorizationSystem [IsWeakFactorizationSystem P₁ P₂] :

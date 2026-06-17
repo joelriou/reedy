@@ -17,13 +17,15 @@ public import Mathlib.CategoryTheory.Limits.FunctorCategory.Finite
 
 @[expose] public section
 
+universe w u
+
 namespace CategoryTheory
 
 open HomotopicalAlgebra Limits
 
 variable {C : Type u} [SmallCategory C] {W₁ W₂ : MorphismProperty C}
   [W₁.IsMultiplicative] [W₂.IsMultiplicative]
-  {α : Type*} [LinearOrder α] [OrderBot α] [SuccOrder α] [WellFoundedLT α]
+  {α : Type w} [LinearOrder α] [OrderBot α] [SuccOrder α] [WellFoundedLT α]
 
 namespace ReedyStructure
 
@@ -75,6 +77,8 @@ instance : (weakEquivalences (r.FunctorCategory D)).HasTwoOutOfThreeProperty :=
   inferInstanceAs (HasTwoOutOfThreeProperty ((weakEquivalences D).functorCategory C))
 
 variable [HasColimitsOfSize.{u, u} D] [HasLimitsOfSize.{u, u} D]
+  [HasColimitsOfSize.{w, w} (Type u)] [NoMaxOrder α]
+  [HasColimitsOfShape α D] [HasIterationOfShape α D]
 
 instance :
     IsWeakFactorizationSystem (cofibrations (r.FunctorCategory D)) (trivialFibrations _) := by
