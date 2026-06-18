@@ -72,9 +72,6 @@ instance {α : Type*} [LinearOrder α] [HasIterationOfShape α C₂] :
 
 end
 
-noncomputable abbrev toUnderArrowLeftFunc : Over Ψ ⥤ Under (Arrow.leftFunc ⋙ Ψ) :=
-  toArrowLeftOver Ψ ⋙ ArrowLeftOver.pushoutFunctor
-
 end Over
 
 end CategoryTheory
@@ -132,18 +129,61 @@ instance [HasColimitsOfSize.{v'', u''} D] [HasColimitsOfSize.{v'', u''} (Type u)
     PreservesColimitsOfSize.{v'', u''}
       (Over.post (X := yoneda (C := C)) (weightedColim₂.{u} (J := C) (J' := C) (C := D))) where
 
+variable (D) in
+noncomputable abbrev overYonedaToUnderArrowLeftFunc :
+    Over (yoneda (C := C)) ⥤ Under (Arrow.leftFunc (C := C ⥤ D)) :=
+    (Over.post (weightedColim₂.{u} (C := D)) ⋙
+      Over.map (weightedColim₂ObjYonedaIso C D).hom ⋙
+      Over.toArrowLeftOver (𝟭 (C ⥤ D)) ⋙ ArrowLeftOver.pushoutFunctor)
+
+section
+
+variable {W : C ⥤ Cᵒᵖ ⥤ Type u} (ιW : W ⟶ yoneda)
+
+variable (D) in
+noncomputable abbrev overYonedaToUnderArrowLeftFunc.inl :
+    (weightedColim₂.obj W).mapArrow ⋙ Arrow.rightFunc ⟶
+      ((overYonedaToUnderArrowLeftFunc D).obj (Over.mk ιW)).right :=
+  pushout.inl _ _
+
+variable (D) in
+noncomputable abbrev overYonedaToUnderArrowLeftFunc.inr :
+    Arrow.leftFunc ⟶
+      ((overYonedaToUnderArrowLeftFunc D).obj (Over.mk ιW)).right :=
+  pushout.inr _ _
+
+variable (D W) in
+noncomputable abbrev overYonedaToUnderArrowLeftFunc.top :
+    ((weightedColim₂ (C := D)).obj W).mapArrow ⋙ Arrow.leftFunc ⟶
+      (weightedColim₂.obj W).mapArrow ⋙ Arrow.rightFunc :=
+  (weightedColim₂.obj W).mapArrow.whiskerLeft Arrow.leftToRight
+
+variable (D) in
+noncomputable abbrev overYonedaToUnderArrowLeftFunc.left :
+    Arrow.leftFunc ⋙ (weightedColim₂ (C := D)).obj W ⟶ Arrow.leftFunc :=
+  Arrow.leftFunc.whiskerLeft (weightedColim₂.map ιW) ≫
+  Arrow.leftFunc.whiskerLeft (weightedColim₂ObjYonedaIso C D).hom
+
+variable (D) in
+omit [HasColimitsOfSize.{u', u'} (Type u)] [HasProducts D] in
+lemma overYonedaToUnderArrowLeftFunc.isPushout :
+    IsPushout
+      (overYonedaToUnderArrowLeftFunc.top D W)
+      (overYonedaToUnderArrowLeftFunc.left D ιW)
+      (overYonedaToUnderArrowLeftFunc.inl D ιW)
+      (overYonedaToUnderArrowLeftFunc.inr D ιW) :=
+  .of_hasPushout ..
+
+end
+
 noncomputable def basicCellRelativeSk (a : α) (c : r.Cell a) :=
-  (Over.post (weightedColim₂.{u} (C := D)) ⋙
-    Over.map (weightedColim₂ObjYonedaIso C D).hom ⋙ Over.toUnderArrowLeftFunc (𝟭 (C ⥤ D)) ⋙
-      Under.forget _).map (r.basicCellOver a c)
+  (overYonedaToUnderArrowLeftFunc D ⋙ Under.forget _).map (r.basicCellOver a c)
 
 set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in
 noncomputable def relativeCellComplexSk :
     RelativeCellComplex.{u} (r.basicCellRelativeSk (D := D)) Arrow.leftToRight :=
-    (r.relativeCellComplexOver.map (Over.post (weightedColim₂.{u} (C := D)) ⋙
-      Over.map (weightedColim₂ObjYonedaIso C D).hom ⋙
-        Over.toUnderArrowLeftFunc (𝟭 (C ⥤ D)))).ofUnder.ofArrowIso (by
+    (r.relativeCellComplexOver.map (overYonedaToUnderArrowLeftFunc D)).ofUnder.ofArrowIso (by
     refine (Arrow.isoMk ?_ ?_ ?_).symm
     · exact (Functor.rightUnitor _).symm ≪≫ pushout.inrIso' _ _ (by
         refine isIso_of_isInitial ?_ ?_ _
