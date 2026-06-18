@@ -224,8 +224,7 @@ set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in
 noncomputable def pushoutOfHom.toSrc :
     dsimp% pushoutOfHom D f ⟶ ((overYonedaToUnderArrowLeftFunc D).obj (Over.mk ιW₁)).right :=
-  pushout.desc (inl D ιW₁)
-    (left D ιW₂ ≫ inr D ιW₁)
+  pushout.desc (inl D ιW₁) (left D ιW₂ ≫ inr D ιW₁)
 
 omit [HasColimitsOfSize.{u', u'} (Type u)] [HasProducts D] in
 set_option backward.defeqAttrib.useBackward true in
@@ -319,13 +318,14 @@ noncomputable def relativeCellComplexSk :
       simp only [Category.id_comp, Category.comp_id]
       exact ((weightedColimObjYonedaObjIso D X).inv.naturality f.hom).symm)
 
+omit [HasColimitsOfSize.{u', u'} (Type u)] [HasProducts D]
+  [NoMaxOrder α] [HasColimitsOfShape α D] [HasIterationOfShape α D] in
 lemma exists_isPushout (a : α) (c : r.Cell a) {F G : C ⥤ D} (f : F ⟶ G) :
-    ∃ t b, IsPushout t
-      ((weightedColim₂.{u}.leibnizPushout.obj
-        (Arrow.mk (r.externalUnionProd c.val).ι)).obj (Arrow.mk f)).hom
-      ((r.basicCellRelativeSk a c).app (Arrow.mk f)) b := by
-  -- use `overYonedaToUnderArrowLeftFunc.isPushout₁₂`
-  sorry
+    ∃ t b, IsPushout t ((overYonedaToUnderArrowLeftFunc.pushoutOfHom.ι D
+      ((r.boundaryCoyonedaObj c).unionExternalProd (r.boundaryYonedaObj c)).ι).app
+      (Arrow.mk f)) ((r.basicCellRelativeSk a c).app (Arrow.mk f)) b :=
+  ⟨_, _, (overYonedaToUnderArrowLeftFunc.isPushout₁₂ D _ _ _
+    (Over.w (r.basicCellOver a c))).flip.map ((evaluation _ _).obj (Arrow.mk f))⟩
 
 end ReedyStructure
 
