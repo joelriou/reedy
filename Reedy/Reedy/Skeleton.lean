@@ -136,45 +136,146 @@ noncomputable abbrev overYonedaToUnderArrowLeftFunc :
       Over.map (weightedColim₂ObjYonedaIso C D).hom ⋙
       Over.toArrowLeftOver (𝟭 (C ⥤ D)) ⋙ ArrowLeftOver.pushoutFunctor)
 
+namespace overYonedaToUnderArrowLeftFunc
+
+variable (D)
+
 section
 
 variable {W : C ⥤ Cᵒᵖ ⥤ Type u} (ιW : W ⟶ yoneda)
 
-variable (D) in
-noncomputable abbrev overYonedaToUnderArrowLeftFunc.inl :
-    (weightedColim₂.obj W).mapArrow ⋙ Arrow.rightFunc ⟶
+noncomputable abbrev inl :
+    Arrow.rightFunc ⋙ weightedColim₂.obj W ⟶
       ((overYonedaToUnderArrowLeftFunc D).obj (Over.mk ιW)).right :=
   pushout.inl _ _
 
-variable (D) in
-noncomputable abbrev overYonedaToUnderArrowLeftFunc.inr :
+noncomputable abbrev inr :
     Arrow.leftFunc ⟶
       ((overYonedaToUnderArrowLeftFunc D).obj (Over.mk ιW)).right :=
   pushout.inr _ _
 
-variable (D W) in
-noncomputable abbrev overYonedaToUnderArrowLeftFunc.top :
-    ((weightedColim₂ (C := D)).obj W).mapArrow ⋙ Arrow.leftFunc ⟶
-      (weightedColim₂.obj W).mapArrow ⋙ Arrow.rightFunc :=
-  (weightedColim₂.obj W).mapArrow.whiskerLeft Arrow.leftToRight
+variable (W) in
+noncomputable abbrev top :
+    Arrow.leftFunc ⋙ (weightedColim₂ (C := D)).obj W ⟶
+      Arrow.rightFunc ⋙ weightedColim₂.obj W :=
+  Functor.whiskerRight Arrow.leftToRight _
 
-variable (D) in
-noncomputable abbrev overYonedaToUnderArrowLeftFunc.left :
+noncomputable abbrev left :
     Arrow.leftFunc ⋙ (weightedColim₂ (C := D)).obj W ⟶ Arrow.leftFunc :=
   Arrow.leftFunc.whiskerLeft (weightedColim₂.map ιW) ≫
   Arrow.leftFunc.whiskerLeft (weightedColim₂ObjYonedaIso C D).hom
 
-variable (D) in
 omit [HasColimitsOfSize.{u', u'} (Type u)] [HasProducts D] in
-lemma overYonedaToUnderArrowLeftFunc.isPushout :
-    IsPushout
-      (overYonedaToUnderArrowLeftFunc.top D W)
-      (overYonedaToUnderArrowLeftFunc.left D ιW)
-      (overYonedaToUnderArrowLeftFunc.inl D ιW)
-      (overYonedaToUnderArrowLeftFunc.inr D ιW) :=
+lemma isPushout :
+    IsPushout (top D W) (left D ιW) (inl D ιW) (inr D ιW) :=
   .of_hasPushout ..
 
+omit [HasColimitsOfSize.{u', u'} (Type u)] [HasProducts D] in
+@[reassoc (attr := simp)]
+lemma w : top D W ≫ inl D ιW = left D ιW ≫ inr D ιW :=
+  (isPushout D ιW).w
+
 end
+
+section
+
+variable {W₁ W₂ : C ⥤ Cᵒᵖ ⥤ Type u} (f : W₁ ⟶ W₂)
+  (ιW₁ : W₁ ⟶ yoneda) (ιW₂ : W₂ ⟶ yoneda) (fac : f ≫ ιW₂ = ιW₁)
+
+noncomputable def pushoutOfHom :
+    Arrow (C ⥤ D) ⥤ C ⥤ D :=
+  pushout (Functor.whiskerRight Arrow.leftToRight (weightedColim₂.{u}.obj W₁))
+    (Functor.whiskerLeft Arrow.leftFunc (weightedColim₂.{u}.map f))
+
+protected noncomputable def pushoutOfHom.inl :
+    Arrow.rightFunc ⋙ weightedColim₂.obj W₁ ⟶ pushoutOfHom D f :=
+  pushout.inl _ _
+
+protected noncomputable def pushoutOfHom.inr :
+    Arrow.leftFunc ⋙ weightedColim₂.obj W₂ ⟶ pushoutOfHom D f :=
+  pushout.inr _ _
+
+omit [HasColimitsOfSize.{u', u'} (Type u)] [HasProducts D] in
+lemma isPushout_pushoutOfHom :
+    IsPushout
+      (Functor.whiskerRight Arrow.leftToRight (weightedColim₂.obj W₁))
+      (Functor.whiskerLeft Arrow.leftFunc (weightedColim₂.map f))
+      (pushoutOfHom.inl D f) (pushoutOfHom.inr D f) :=
+  .of_hasPushout ..
+
+set_option backward.defeqAttrib.useBackward true in
+noncomputable def pushoutOfHom.ι : pushoutOfHom D f ⟶ Arrow.rightFunc ⋙ weightedColim₂.obj W₂ :=
+  pushout.desc (Functor.whiskerLeft _ (weightedColim₂.map f))
+    (Functor.whiskerRight (Arrow.leftToRight) _)
+
+omit [HasColimitsOfSize.{u', u'} (Type u)] [HasProducts D] in
+@[reassoc (attr := simp)]
+lemma pushoutOfHom.inl_ι :
+    pushoutOfHom.inl D f ≫ pushoutOfHom.ι D f = Functor.whiskerLeft _ (weightedColim₂.map f) :=
+  pushout.inl_desc ..
+
+omit [HasColimitsOfSize.{u', u'} (Type u)] [HasProducts D] in
+@[reassoc (attr := simp)]
+lemma pushoutOfHom.inr_ι :
+    pushoutOfHom.inr D f ≫ pushoutOfHom.ι D f = Functor.whiskerRight (Arrow.leftToRight) _ :=
+  pushout.inr_desc ..
+
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
+noncomputable def pushoutOfHom.toSrc :
+    dsimp% pushoutOfHom D f ⟶ ((overYonedaToUnderArrowLeftFunc D).obj (Over.mk ιW₁)).right :=
+  pushout.desc (inl D ιW₁)
+    (left D ιW₂ ≫ inr D ιW₁)
+
+omit [HasColimitsOfSize.{u', u'} (Type u)] [HasProducts D] in
+set_option backward.defeqAttrib.useBackward true in
+@[reassoc (attr := simp)]
+lemma pushoutOfHom.inr_toSrc :
+    dsimp% pushoutOfHom.inr D f ≫ pushoutOfHom.toSrc D f ιW₁ ιW₂ fac =
+      left D ιW₂ ≫ inr D ιW₁ :=
+  pushout.inr_desc ..
+
+omit [HasColimitsOfSize.{u', u'} (Type u)] [HasProducts D] in
+@[reassoc (attr := simp)]
+lemma pushoutOfHom.inl_toSrc :
+    pushoutOfHom.inl D f ≫ pushoutOfHom.toSrc D f ιW₁ ιW₂ fac =
+      inl D ιW₁ :=
+  pushout.inl_desc ..
+
+omit [HasColimitsOfSize.{u', u'} (Type u)] [HasProducts D] in
+lemma isPushout₁ :
+    IsPushout (pushoutOfHom.inr D f)
+      (left D ιW₂) (pushoutOfHom.toSrc D f ιW₁ ιW₂ fac)
+      (inr D ιW₁) := by
+  refine IsPushout.of_top ?_ (by simp) (isPushout_pushoutOfHom D f)
+  convert isPushout D ιW₁ using 1 <;> cat_disch
+
+set_option backward.isDefEq.respectTransparency false in
+omit [HasColimitsOfSize.{u', u'} (Type u)] [HasProducts D] in
+lemma isPushout₁₂ :
+    IsPushout (pushoutOfHom.ι D f)
+      (pushoutOfHom.toSrc D f ιW₁ ιW₂ fac)
+      (inl D ιW₂)
+      ((overYonedaToUnderArrowLeftFunc D).map
+      (Over.homMk f : Over.mk ιW₁ ⟶ Over.mk ιW₂)).right := by
+  apply IsPushout.of_left ?_ ?_ (isPushout₁ D f ιW₁ ιW₂ fac)
+  · convert isPushout D ιW₂ <;> simp
+  · set_option backward.defeqAttrib.useBackward true in
+    apply pushout.hom_ext
+    · dsimp [pushoutOfHom.ι]
+      rw [pushout.inl_desc_assoc]
+      erw [pushoutOfHom.inl_toSrc_assoc]
+      rw [pushout.inl_desc]
+      rfl
+    · dsimp [pushoutOfHom.ι]
+      rw [pushout.inr_desc_assoc]
+      erw [pushoutOfHom.inr_toSrc_assoc]
+      rw [pushout.inr_desc]
+      cat_disch
+
+end
+
+end overYonedaToUnderArrowLeftFunc
 
 noncomputable def basicCellRelativeSk (a : α) (c : r.Cell a) :=
   (overYonedaToUnderArrowLeftFunc D ⋙ Under.forget _).map (r.basicCellOver a c)
@@ -223,6 +324,7 @@ lemma exists_isPushout (a : α) (c : r.Cell a) {F G : C ⥤ D} (f : F ⟶ G) :
       ((weightedColim₂.{u}.leibnizPushout.obj
         (Arrow.mk (r.externalUnionProd c.val).ι)).obj (Arrow.mk f)).hom
       ((r.basicCellRelativeSk a c).app (Arrow.mk f)) b := by
+  -- use `overYonedaToUnderArrowLeftFunc.isPushout₁₂`
   sorry
 
 end ReedyStructure
