@@ -93,9 +93,53 @@ noncomputable def relativeLatchingMap (X : C) :
     r.relativeLatchingSrc X ⟶ Arrow.rightFunc ⋙ (evaluation C D).obj X :=
   pushout.desc _ _ (Functor.whiskerLeft_comp_whiskerRight _ _)
 
+@[reassoc (attr := simp)]
+lemma inl_relativeLatchingMap (X : C) :
+    relativeLatchingSrc.inl r X ≫ r.relativeLatchingMap X (D := D) =
+      Functor.whiskerRight Arrow.leftToRight _ :=
+  pushout.inl_desc ..
+
+@[reassoc (attr := simp)]
+lemma inl_app_relativeLatchingMap_app (X : C) {F G : C ⥤ D} (f : F ⟶ G) :
+    (relativeLatchingSrc.inl r X).app (Arrow.mk f) ≫
+      (r.relativeLatchingMap X).app (Arrow.mk f) = f.app X :=
+  NatTrans.congr_app (r.inl_relativeLatchingMap X) (Arrow.mk f)
+
+@[reassoc (attr := simp)]
+lemma inr_relativeLatchingMap (X : C) :
+    relativeLatchingSrc.inr r X ≫ r.relativeLatchingMap X (D := D) =
+      Functor.whiskerLeft _ (r.latchingι X ) :=
+  pushout.inr_desc ..
+
+@[reassoc (attr := simp)]
+lemma inr_app_relativeLatchingMap_app (X : C) {F G : C ⥤ D} (f : F ⟶ G) :
+    (relativeLatchingSrc.inr r X).app (Arrow.mk f) ≫
+      (r.relativeLatchingMap X).app (Arrow.mk f) = (r.latchingι X).app G :=
+  NatTrans.congr_app (r.inr_relativeLatchingMap X) (Arrow.mk f)
+
 -- C.4.15
 noncomputable def relativeLatchingFunctor (X : C) : Arrow (C ⥤ D) ⥤ Arrow D :=
   Arrow.mkFunctor (r.relativeLatchingMap X)
+
+attribute [local simp] latchingι
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
+noncomputable def relativeLatchingPushoutObjObj (X : C) {F G : C ⥤ D} (i : F ⟶ G) :
+      weightedColim.PushoutObjObj (r.boundaryYonedaObj X).ι i where
+  pt := (r.relativeLatchingSrc X).obj (Arrow.mk i)
+  inl :=
+    (weightedColimObjYonedaObjIso D X).hom.app _ ≫
+      (relativeLatchingSrc.inl r X).app (Arrow.mk i)
+  inr := (relativeLatchingSrc.inr r X).app (Arrow.mk i)
+  ι := (r.relativeLatchingMap X).app (Arrow.mk i) ≫
+      (weightedColimObjYonedaObjIso D X).inv.app _
+  inl_ι := by
+    rw [← cancel_mono (WeightedCocone.isColimitYoneda G X).iso.hom]
+    cat_disch
+  isPushout :=
+    IsPushout.of_iso ((relativeLatchingSrc.isPushout r X).app (Arrow.mk i))
+      (Iso.refl _) ((weightedColimObjYonedaObjIso D X).symm.app _) (Iso.refl _)
+      (Iso.refl _) (by simp) (by simp) (by simp) (by simp)
 
 end ReedyStructure
 

@@ -94,9 +94,54 @@ noncomputable def relativeMatchingMap (X : C) :
     Arrow.leftFunc ⋙ (evaluation C D).obj X ⟶ r.relativeMatchingTgt X :=
   pullback.lift _ _ (Functor.whiskerLeft_comp_whiskerRight _ _).symm
 
+@[reassoc (attr := simp)]
+lemma relativeMatchingMap_fst (X : C) :
+    r.relativeMatchingMap (D := D) X ≫ relativeMatchingTgt.fst r X =
+      Functor.whiskerRight Arrow.leftToRight _ :=
+  pullback.lift_fst ..
+
+@[reassoc (attr := simp)]
+lemma relativeMatchingMap_app_fst_app (X : C) {F G : C ⥤ D} (f : F ⟶ G) :
+    (r.relativeMatchingMap  X).app (Arrow.mk f) ≫
+      (relativeMatchingTgt.fst r X).app (Arrow.mk f) = f.app X :=
+  NatTrans.congr_app (r.relativeMatchingMap_fst X) (Arrow.mk f)
+
+@[reassoc (attr := simp)]
+lemma relativeMatchingMap_snd (X : C) :
+    r.relativeMatchingMap (D := D) X ≫ relativeMatchingTgt.snd r X =
+      Functor.whiskerLeft _ (r.matchingπ X) :=
+  pullback.lift_snd ..
+
+@[reassoc (attr := simp)]
+lemma relativeMatchingMap_app_snd_app (X : C) {F G : C ⥤ D} (f : F ⟶ G) :
+    (r.relativeMatchingMap X).app (Arrow.mk f) ≫
+      (relativeMatchingTgt.snd r X).app (Arrow.mk f) =
+      (r.matchingπ X).app F :=
+  NatTrans.congr_app (r.relativeMatchingMap_snd X) (Arrow.mk f)
+
 -- C.4.15
 noncomputable def relativeMatchingFunctor (X : C) : Arrow (C ⥤ D) ⥤ Arrow D :=
   Arrow.mkFunctor (r.relativeMatchingMap X)
+
+attribute [local simp] matchingπ in
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
+noncomputable def relativeMatchingPullbackObjObj (X : C) {F G : C ⥤ D} (p : F ⟶ G) :
+      weightedLim.PullbackObjObj (r.boundaryCoyonedaObj X).ι p where
+  pt := (r.relativeMatchingTgt X).obj (Arrow.mk p)
+  fst := (relativeMatchingTgt.snd r X).app (Arrow.mk p)
+  snd := (relativeMatchingTgt.fst r X).app (Arrow.mk p) ≫
+      (weightedLimObjCoyonedaObjIso D X).inv.app G
+  π := (weightedLimObjCoyonedaObjIso D X).hom.app F ≫
+      (r.relativeMatchingMap X).app (Arrow.mk p)
+  π_snd := by
+    rw [← cancel_epi (WeightedCone.isLimitCoyoneda F X).iso.inv]
+    cat_disch
+  isPullback :=
+    IsPullback.of_iso ((relativeMatchingTgt.isPullback r X).flip.app (Arrow.mk p))
+      (Iso.refl _) (Iso.refl _)
+      ((weightedLimObjCoyonedaObjIso D X).symm.app _) (Iso.refl _)
+      (by simp) (by simp) (by simp) (by simp)
 
 end ReedyStructure
 

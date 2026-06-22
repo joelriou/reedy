@@ -7,7 +7,9 @@ module
 
 public import Mathlib.CategoryTheory.Limits.FunctorCategory.EpiMono
 public import Mathlib.CategoryTheory.Limits.Types.Pushouts
+public import Mathlib.CategoryTheory.Limits.Types.Multicoequalizer
 public import Mathlib.CategoryTheory.Subfunctor.Basic
+public import Mathlib.Order.CompleteLattice.MulticoequalizerDiagram
 
 /-!
 # Subfunctors of bifuntors to types
@@ -19,6 +21,8 @@ public import Mathlib.CategoryTheory.Subfunctor.Basic
 universe w v v' u u'
 
 namespace CategoryTheory
+
+open Limits
 
 variable {C : Type u} [Category.{v} C] {D : Type u'} [Category.{v'} D]
   (F G : C ⥤ D ⥤ Type w)
@@ -322,6 +326,31 @@ lemma topIso_hom : (topIso F).hom = Subfunctor₂.ι _ := rfl
 
 @[reassoc (attr := simp)]
 lemma topIso_inv_ι : (topIso F).inv ≫ Subfunctor₂.ι _ = 𝟙 _ := rfl
+
+end
+
+section
+
+abbrev BicartSq (A₁ A₂ A₃ A₄ : Subfunctor₂ F) := Lattice.BicartSq A₁ A₂ A₃ A₄
+
+lemma BicartSq.isPushout {A₁ A₂ A₃ A₄ : Subfunctor₂ F}
+    (sq : BicartSq A₁ A₂ A₃ A₄) :
+    IsPushout (homOfLE sq.le₁₂) (homOfLE sq.le₁₃)
+    (homOfLE sq.le₂₄) (homOfLE sq.le₃₄) where
+  w := rfl
+  isColimit' :=
+    ⟨evaluationJointlyReflectsColimits _ (fun U ↦
+      (PushoutCocone.isColimitMapCoconeEquiv _ _).2
+        (evaluationJointlyReflectsColimits _ (fun V ↦
+      (PushoutCocone.isColimitMapCoconeEquiv _ _).2 (by
+        have h : Lattice.BicartSq (A₁.obj U V) (A₂.obj U V) (A₃.obj U V) (A₄.obj U V) :=
+          { sup_eq := by
+              rw [← sq.sup_eq]
+              rfl
+            inf_eq := by
+              rw [← sq.inf_eq]
+              rfl }
+        exact (Types.isPushout_of_bicartSq h).isColimit))))⟩
 
 end
 

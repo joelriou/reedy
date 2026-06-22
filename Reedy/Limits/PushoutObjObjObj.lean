@@ -42,24 +42,18 @@ structure PushoutObjObjObj where
       (((F.obj X₁).obj Y₂).map f₃) (((F.map f₁).app Y₂).app X₃)
       (((F.obj X₁).map f₂).app Y₃) (((F.map f₁).app X₂).app Y₃)
       ι₁ ι₂ ι₃
+  ι : pt ⟶ ((F.obj Y₁).obj Y₂).obj Y₃ :=
+    isPushout₃.desc (((F.map f₁).app Y₂).app Y₃) (((F.obj Y₁).map f₂).app Y₃)
+      (((F.obj Y₁).obj Y₂).map f₃)
+  ι₁_ι : ι₁ ≫ ι = ((F.map f₁).app Y₂).app Y₃ := by cat_disch
+  ι₂_ι : ι₂ ≫ ι = ((F.obj Y₁).map f₂).app Y₃ := by cat_disch
+  ι₃_ι : ι₃ ≫ ι = ((F.obj Y₁).obj Y₂).map f₃ := by cat_disch
 
 namespace PushoutObjObjObj
 
 variable {F f₁ f₂ f₃} (sq₃ : PushoutObjObjObj F f₁ f₂ f₃)
 
-@[no_expose]
-noncomputable def ι : sq₃.pt ⟶ ((F.obj Y₁).obj Y₂).obj Y₃ :=
-  sq₃.isPushout₃.desc (((F.map f₁).app Y₂).app Y₃) (((F.obj Y₁).map f₂).app Y₃)
-    (((F.obj Y₁).obj Y₂).map f₃)
-
-@[reassoc (attr := simp)]
-lemma ι₁_ι : sq₃.ι₁ ≫ sq₃.ι = ((F.map f₁).app Y₂).app Y₃ := by simp [ι]
-
-@[reassoc (attr := simp)]
-lemma ι₂_ι : sq₃.ι₂ ≫ sq₃.ι = ((F.obj Y₁).map f₂).app Y₃ := by simp [ι]
-
-@[reassoc (attr := simp)]
-lemma ι₃_ι : sq₃.ι₃ ≫ sq₃.ι = ((F.obj Y₁).obj Y₂).map f₃ := by simp [ι]
+attribute [reassoc (attr := simp)] ι₁_ι ι₂_ι ι₃_ι
 
 section
 
@@ -141,18 +135,8 @@ def ofNatIso : F'.PushoutObjObjObj f₁ f₂ f₃ where
       (NatTrans.congr_app (NatTrans.congr_app (e.hom.naturality f₁) _) _)
       (NatTrans.congr_app (NatTrans.congr_app (e.hom.naturality f₁) _) _)) _ _
         (by exact PushoutCocone₃.ext (Iso.refl _)) sq₃.isPushout₃.isColimit⟩
-
-set_option backward.defeqAttrib.useBackward true in
-@[simp, reassoc]
-lemma ofNatIso_ι :
-    (sq₃.ofNatIso e).ι = sq₃.ι ≫ ((e.hom.app _).app _).app _ := by
-  apply (sq₃.ofNatIso e).isPushout₃.hom_ext
-  · rw [(sq₃.ofNatIso e).ι₁_ι]
-    simp [← NatTrans.comp_app]
-  · rw [(sq₃.ofNatIso e).ι₂_ι]
-    simp
-  · rw [(sq₃.ofNatIso e).ι₃_ι]
-    simp
+  ι := sq₃.ι ≫ ((e.hom.app _).app _).app _
+  ι₁_ι := by simp [← NatTrans.comp_app]
 
 end
 
@@ -161,6 +145,7 @@ end PushoutObjObjObj
 end
 
 set_option backward.defeqAttrib.useBackward true in
+@[simps]
 def PushoutObjObj.bifunctorComp₁₂
     {F₁₂ : C₁ ⥤ C₂ ⥤ C₁₂} {G : C₁₂ ⥤ C₃ ⥤ D}
     {X₁ Y₁ : C₁} {f₁ : X₁ ⟶ Y₁} {X₂ Y₂ : C₂} {f₂ : X₂ ⟶ Y₂}
@@ -203,8 +188,12 @@ def PushoutObjObj.bifunctorComp₁₂
           rw [← NatTrans.comp_app_assoc, ← G.map_comp, sq₁₂.inr_ι, ← h₁,
             ← NatTrans.naturality_assoc, hp₀])
       exact ⟨l, by simp [hl₂, hp₀], by simp [hl₂, hp₁], hl₁⟩
+  ι := sq.ι
+  ι₁_ι := by simp [← NatTrans.comp_app, ← Functor.map_comp]
+  ι₂_ι := by simp [← NatTrans.comp_app, ← Functor.map_comp]
 
 set_option backward.defeqAttrib.useBackward true in
+@[simps]
 def PushoutObjObj.bifunctorComp₂₃
     {F : C₁ ⥤ C₂₃ ⥤ D} {G₂₃ : C₂ ⥤ C₃ ⥤ C₂₃}
     {X₂ Y₂ : C₂} {f₂ : X₂ ⟶ Y₂}
@@ -245,6 +234,9 @@ def PushoutObjObj.bifunctorComp₂₃
         · rw [NatTrans.naturality_assoc, hp₁,
             ← Functor.map_comp_assoc, inr_ι, h₂])
       exact ⟨l, hl₂, by simp [hl₁, hp₁], by simp [hl₁, hp₂]⟩
+  ι := sq.ι
+  ι₂_ι := by simp [← Functor.map_comp]
+  ι₃_ι := by simp [← Functor.map_comp]
 
 end Functor
 
