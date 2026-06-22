@@ -49,7 +49,6 @@ open MorphismProperty
 variable (r : ReedyStructure W₁ W₂ α) {D : Type*} [Category* D]
   (P₁ : MorphismProperty D) (P₂ : MorphismProperty D)
 
-
 def left [HasColimitsOfSize.{u, u} D] : MorphismProperty (C ⥤ D) :=
   ⨅ (X : C), .ofArrowObj (P₁.arrowObj.inverseImage (r.relativeLatchingFunctor X))
 
@@ -59,6 +58,14 @@ lemma left.apply [HasColimitsOfSize.{u, u} D] {F G : C ⥤ D} {f : F ⟶ G} (h :
   simp only [left, iInf_iff] at h
   exact h _
 
+variable {r P₁} in
+set_option backward.isDefEq.respectTransparency false in
+lemma left.apply' [P₁.RespectsIso] [HasColimitsOfSize.{u, u} D] {F G : C ⥤ D} {f : F ⟶ G}
+    (h : r.left P₁ f) (X : C) :
+    P₁ (r.relativeLatchingPushoutObjObj X f).ι := by
+  refine (P₁.arrow_mk_iso_iff ?_).1 (h.apply X)
+  exact Arrow.isoMk (Iso.refl _) ((weightedColimObjYonedaObjIso D X).symm.app G)
+
 def right [HasLimitsOfSize.{u, u} D] : MorphismProperty (C ⥤ D) :=
   ⨅ (X : C), .ofArrowObj (P₂.arrowObj.inverseImage (r.relativeMatchingFunctor X))
 
@@ -67,6 +74,14 @@ lemma right.apply [HasLimitsOfSize.{u, u} D] {F G : C ⥤ D} {f : F ⟶ G} (h : 
     P₂ ((r.relativeMatchingFunctor X).obj (Arrow.mk f)).hom := by
   simp only [right, iInf_iff] at h
   exact h _
+
+variable {r P₂} in
+set_option backward.isDefEq.respectTransparency false in
+lemma right.apply' [P₂.RespectsIso] [HasLimitsOfSize.{u, u} D] {F G : C ⥤ D} {f : F ⟶ G}
+    (h : r.right P₂ f) (X : C) :
+    P₂ (r.relativeMatchingPullbackObjObj X f).π := by
+  refine (P₂.arrow_mk_iso_iff ?_).2 (h.apply X)
+  exact Arrow.isoMk ((weightedLimObjCoyonedaObjIso D X).app _) (Iso.refl _)
 
 variable [HasColimitsOfSize.{u, u} D] [HasLimitsOfSize.{u, u} D]
 
@@ -101,18 +116,12 @@ lemma hasLiftingProperty [IsWeakFactorizationSystem P₁ P₂]
   · intro c
     obtain ⟨t, b, sq⟩ := r.exists_isPushout c.j c.i i
     refine MorphismProperty.of_isPushout sq ?_
-    replace hi := hi.apply c.i
-    replace hp := hp.apply c.i
     rw [llp_ofHoms_iff_hasLiftingProperty]
     let α := (Subfunctor.pushoutObjObjExternalProductFunctor
       (r.boundaryCoyonedaObj c.i) (r.boundaryYonedaObj c.i))
     let β := overYonedaToUnderArrowLeftFunc.pushoutOfHom.pushoutObjObj D α.ι i
     let αβ := Functor.PushoutObjObj.bifunctorComp₁₂ α β
     let α' := r.relativeLatchingPushoutObjObj c.i i
-    have (Z : C ⥤ Type u) : PreservesColimit
-      (span ((weightedColim.map (r.boundaryYonedaObj ↑c.i).ι).app A)
-      ((weightedColim.obj (r.boundaryYonedaObj ↑c.i).toFunctor).map i))
-      (weightedLimLeftAdj.obj Z) := by sorry
     let β' : weightedLimLeftAdj.PushoutObjObj
       (r.boundaryCoyonedaObj c.i).ι α'.ι := .ofHasPushout ..
     let αβ' := (Functor.PushoutObjObj.bifunctorComp₂₃ α' β').ofNatIso
@@ -124,8 +133,15 @@ lemma hasLiftingProperty [IsWeakFactorizationSystem P₁ P₂]
             (((weightedColim₂.bifunctorComp₁₂Iso.app _).app _).app _))
     change HasLiftingProperty β.ι p
     rw [HasLiftingProperty.iff_of_arrow_iso_left e,
-      weightedLimAdj₂.hasLiftingProperty_iff _ sorry]
-    sorry
+      weightedLimAdj₂.hasLiftingProperty_iff _
+        (r.relativeMatchingPullbackObjObj c.i p)]
+    have : P₁.RespectsIso := by
+      rw [← llp_eq_of_wfs P₁ P₂]
+      infer_instance
+    have : P₂.RespectsIso := by
+      rw [← rlp_eq_of_wfs P₁ P₂]
+      infer_instance
+    exact hasLiftingProperty_of_wfs _ _ (hi.apply' c.i) (hp.apply' c.i)
 
 -- C.5.5
 instance isWeakFactorizationSystem [IsWeakFactorizationSystem P₁ P₂] :

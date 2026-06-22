@@ -270,6 +270,10 @@ instance (F : J' ⥤ C) {K : Type*} [Category* K] [HasColimitsOfShape K (Type w)
     PreservesLimitsOfShape Kᵒᵖ (weightedLim.flip.obj F : (J' ⥤ Type w)ᵒᵖ ⥤ C) :=
   weightedLimAdj₂.preservesLimitsOfShape_flip_obj _ _
 
+instance (F : J' ⥤ Type w) :
+    ((weightedLimLeftAdj (C := C)).obj F).IsLeftAdjoint :=
+  (weightedLimAdj₂.adj F).isLeftAdjoint
+
 end
 
 section
