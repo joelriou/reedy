@@ -210,10 +210,8 @@ section
 
 variable [HasCoproducts.{w} C]
 
-@[simps]
-noncomputable def weightedLimLeftAdj : (J' ⥤ Type w) ⥤ C ⥤ (J' ⥤ C) where
-  obj Q := sigmaConst.{w} ⋙ (Functor.whiskeringLeft ..).obj Q
-  map {Q₁ Q₂} f := Functor.whiskerLeft _ ((Functor.whiskeringLeft ..).map f)
+noncomputable abbrev weightedLimLeftAdj : (J' ⥤ Type w) ⥤ C ⥤ (J' ⥤ C) :=
+  (sigmaConst.{w} ⋙ Functor.whiskeringRight _ _ _).flip
 
 set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in

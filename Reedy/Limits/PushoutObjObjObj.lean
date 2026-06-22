@@ -145,6 +145,7 @@ end PushoutObjObjObj
 end
 
 set_option backward.defeqAttrib.useBackward true in
+@[simps]
 def PushoutObjObj.bifunctorComp₁₂
     {F₁₂ : C₁ ⥤ C₂ ⥤ C₁₂} {G : C₁₂ ⥤ C₃ ⥤ D}
     {X₁ Y₁ : C₁} {f₁ : X₁ ⟶ Y₁} {X₂ Y₂ : C₂} {f₂ : X₂ ⟶ Y₂}
@@ -192,6 +193,7 @@ def PushoutObjObj.bifunctorComp₁₂
   ι₂_ι := by simp [← NatTrans.comp_app, ← Functor.map_comp]
 
 set_option backward.defeqAttrib.useBackward true in
+@[simps]
 def PushoutObjObj.bifunctorComp₂₃
     {F : C₁ ⥤ C₂₃ ⥤ D} {G₂₃ : C₂ ⥤ C₃ ⥤ C₂₃}
     {X₂ Y₂ : C₂} {f₂ : X₂ ⟶ Y₂}

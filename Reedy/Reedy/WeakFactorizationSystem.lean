@@ -7,12 +7,14 @@ module
 
 public import Mathlib.CategoryTheory.MorphismProperty.WeakFactorizationSystem
 public import Mathlib.CategoryTheory.SmallObject.TransfiniteCompositionLifting
+public import Mathlib.CategoryTheory.LiftingProperties.ParametrizedAdjunction
 public import Reedy.Arrow.ObjectProperty
 public import Reedy.MorphismProperty.Retracts
 public import Reedy.ObjectProperty.Retracts
 public import Reedy.Reedy.Latching
 public import Reedy.Reedy.Matching
 public import Reedy.Reedy.Skeleton
+public import Reedy.Limits.PushoutObjObjObj
 
 /-!
 # Weak factorization systems on the category of functors
@@ -83,6 +85,8 @@ variable [HasColimitsOfSize.{w, w} (Type u)] [NoMaxOrder α]
   [HasColimitsOfShape α D] [HasIterationOfShape α D]
 
 -- C.5.6
+set_option backward.isDefEq.respectTransparency false in
+set_option backward.defeqAttrib.useBackward true in
 lemma hasLiftingProperty [IsWeakFactorizationSystem P₁ P₂]
     {A B X Y : C ⥤ D} (i : A ⟶ B) (p : X ⟶ Y) (hi : r.left P₁ i) (hp : r.right P₂ p) :
     HasLiftingProperty i p := by
@@ -99,6 +103,28 @@ lemma hasLiftingProperty [IsWeakFactorizationSystem P₁ P₂]
     refine MorphismProperty.of_isPushout sq ?_
     replace hi := hi.apply c.i
     replace hp := hp.apply c.i
+    rw [llp_ofHoms_iff_hasLiftingProperty]
+    let α := (Subfunctor.pushoutObjObjExternalProductFunctor
+      (r.boundaryCoyonedaObj c.i) (r.boundaryYonedaObj c.i))
+    let β := overYonedaToUnderArrowLeftFunc.pushoutOfHom.pushoutObjObj D α.ι i
+    let αβ := Functor.PushoutObjObj.bifunctorComp₁₂ α β
+    let α' := r.relativeLatchingPushoutObjObj c.i i
+    have (Z : C ⥤ Type u) : PreservesColimit
+      (span ((weightedColim.map (r.boundaryYonedaObj ↑c.i).ι).app A)
+      ((weightedColim.obj (r.boundaryYonedaObj ↑c.i).toFunctor).map i))
+      (weightedLimLeftAdj.obj Z) := by sorry
+    let β' : weightedLimLeftAdj.PushoutObjObj
+      (r.boundaryCoyonedaObj c.i).ι α'.ι := .ofHasPushout ..
+    let αβ' := (Functor.PushoutObjObj.bifunctorComp₂₃ α' β').ofNatIso
+      weightedColim₂.bifunctorComp₁₂Iso.symm
+    have e : Arrow.mk β.ι ≅ Arrow.mk β'.ι :=
+      (αβ.arrowUnique ((Functor.PushoutObjObj.bifunctorComp₂₃ α' β').ofNatIso
+        weightedColim₂.bifunctorComp₁₂Iso.symm)).trans
+          (Arrow.isoMk (Iso.refl _)
+            (((weightedColim₂.bifunctorComp₁₂Iso.app _).app _).app _))
+    change HasLiftingProperty β.ι p
+    rw [HasLiftingProperty.iff_of_arrow_iso_left e,
+      weightedLimAdj₂.hasLiftingProperty_iff _ sorry]
     sorry
 
 -- C.5.5

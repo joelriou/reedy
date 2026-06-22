@@ -220,6 +220,17 @@ lemma pushoutOfHom.inr_ι :
     pushoutOfHom.inr D f ≫ pushoutOfHom.ι D f = Functor.whiskerRight (Arrow.leftToRight) _ :=
   pushout.inr_desc ..
 
+@[simps]
+noncomputable def pushoutOfHom.pushoutObjObj {F G : C ⥤ D} (g : F ⟶ G) :
+    weightedColim₂.PushoutObjObj f g where
+  pt := (pushoutOfHom D f).obj (Arrow.mk g)
+  inl := (pushoutOfHom.inr D f).app (Arrow.mk g)
+  inr := (pushoutOfHom.inl D f).app (Arrow.mk g)
+  ι := (pushoutOfHom.ι D f).app (Arrow.mk g)
+  inl_ι := NatTrans.congr_app (inr_ι _ _) _
+  inr_ι := NatTrans.congr_app (inl_ι _ _) _
+  isPushout := (isPushout_pushoutOfHom D f).flip.app (Arrow.mk g)
+
 set_option backward.isDefEq.respectTransparency false in
 set_option backward.defeqAttrib.useBackward true in
 noncomputable def pushoutOfHom.toSrc :
