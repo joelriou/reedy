@@ -27,7 +27,10 @@ import Reedy.Reedy.ModelCategory
 import Reedy.Reedy.RelativeCellComplex
 import Reedy.Reedy.SimplexCategory
 import Reedy.Reedy.Skeleton
-import Reedy.Reedy.WeakFactorizationSystem
+import Reedy.Reedy.WeakFactorizationSystem.Basic
+import Reedy.Reedy.WeakFactorizationSystem.Defs
+import Reedy.Reedy.WeakFactorizationSystem.Factorization
+import Reedy.Reedy.WeakFactorizationSystem.LiftingProperty
 import Reedy.RelativeCellComplex.Map
 import Reedy.RelativeCellComplex.OfArrowIso
 import Reedy.RelativeCellComplex.Under

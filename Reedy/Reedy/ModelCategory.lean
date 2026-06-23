@@ -5,7 +5,7 @@ Authors: Joël Riou
 -/
 module
 
-public import Reedy.Reedy.WeakFactorizationSystem
+public import Reedy.Reedy.WeakFactorizationSystem.Basic
 public import Reedy.MorphismProperty.HasTwoOutOfThreeProperty
 public import Mathlib.AlgebraicTopology.ModelCategory.Basic
 public import Mathlib.CategoryTheory.Limits.FunctorCategory.Finite
